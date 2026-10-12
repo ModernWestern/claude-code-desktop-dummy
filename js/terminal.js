@@ -90,7 +90,7 @@ const EXAMPLE = (window.EXAMPLE_SCRIPT || '').replace(/^\s*\n/, ''); // js/examp
 const storedScript = lsGet(LS_SCRIPT);
 const firstRun = storedScript == null;
 // An old built-in example saved in the browser is replaced by the current one; a script you wrote is kept.
-const isOldExample = t => (/GUION DE EJEMPLO/.test(t || '') && /agujeros negros/i.test(t || '')) || (/CLAUDE SIMULATOR · EXAMPLE SCRIPT/.test(t || '') && /^(@user: Alex|user: ultrathink .*)$/m.test(t || ''));
+const isOldExample = t => (/GUION DE EJEMPLO/.test(t || '') && /agujeros negros/i.test(t || '')) || (/CLAUDE SIMULATOR · EXAMPLE SCRIPT/.test(t || '') && /^(@user: Alex|user: ultrathink .*|\[title Physics rescue attempt\])$/m.test(t || ''));
 let SCRIPT = storedScript && storedScript.trim() && !isOldExample(storedScript) ? storedScript : EXAMPLE;
 if (storedScript && isOldExample(storedScript)) lsSet(LS_SCRIPT, EXAMPLE);
 
@@ -263,11 +263,20 @@ function compile(src) {
   }
   flush();
   const out = [];
+  // A session is named once (@title or its first [title]) and keeps that name; /clear starts a new one.
+  let titled = !!(hdr.titulo || hdr.title);
   for (const s of steps) {
     if (s.t === 'choose') {
       const p = [...out].reverse().find(x => x.t === 'perm');
       if (p) p.choice = s.n; else warn.push(`Line ${s.line}: [choose] without a "permission:" before it`);
-    } else out.push(s);
+      continue;
+    }
+    if (s.t === 'clear' || (s.t === 'user' && /^\/clear\b/i.test(s.text))) titled = false;
+    else if (s.t === 'title') {
+      if (titled) { warn.push(`Line ${s.line}: [title] ignored: the session already has a title (it never changes; /clear starts a new session)`); continue; }
+      titled = true;
+    }
+    out.push(s);
   }
   return { steps: out, hdr, warn };
 }

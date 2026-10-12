@@ -201,7 +201,7 @@ const EXAMPLE = (window.EXAMPLE_SCRIPT || '').replace(/^\s*\n/, ''); // js/examp
 const storedScript = lsGet(LS_SCRIPT);
 const firstRun = lsGet(LS_S) == null;
 // An old built-in example saved in the browser is replaced by the current one; a script you wrote is kept.
-const isOldExample = t => (/GUION DE EJEMPLO/.test(t || '') && /agujeros negros/i.test(t || '')) || (/CLAUDE SIMULATOR · EXAMPLE SCRIPT/.test(t || '') && /^(@user: Alex|user: ultrathink .*)$/m.test(t || ''));
+const isOldExample = t => (/GUION DE EJEMPLO/.test(t || '') && /agujeros negros/i.test(t || '')) || (/CLAUDE SIMULATOR · EXAMPLE SCRIPT/.test(t || '') && /^(@user: Alex|user: ultrathink .*|\[title Physics rescue attempt\])$/m.test(t || ''));
 let SCRIPT = storedScript && storedScript.trim() && !isOldExample(storedScript) ? storedScript : EXAMPLE;
 if (storedScript && isOldExample(storedScript)) lsSet(LS_SCRIPT, EXAMPLE);
 // Old default sidebar → the new generic one.
@@ -369,9 +369,18 @@ function compile(src) {
   }
   flush();
   const out = [];
+  // A session is named once (@title, a [title] in its first turn, or its first message) and keeps that name; /clear starts a new one.
+  let titled = !!(hdr.titulo || hdr.title), answered = false;
   for (const s of steps) {
-    if (s.t === 'choose') { const p = [...out].reverse().find(x => x.t === 'perm'); if (p) p.choice = s.n; else warn.push(`Line ${s.line}: [choose] without a "permission:" before it`); }
-    else out.push(s);
+    if (s.t === 'choose') { const p = [...out].reverse().find(x => x.t === 'perm'); if (p) p.choice = s.n; else warn.push(`Line ${s.line}: [choose] without a "permission:" before it`); continue; }
+    if (s.t === 'clear' || (s.t === 'user' && /^\/clear\b/i.test(s.text))) { titled = answered = false; }
+    else if (s.t === 'user' && answered) titled = true;
+    else if (s.t === 'claude') answered = true;
+    else if (s.t === 'title') {
+      if (titled) { warn.push(`Line ${s.line}: [title] ignored: the session already has a title (it never changes; /clear starts a new session)`); continue; }
+      titled = true;
+    }
+    out.push(s);
   }
   return { steps: out, hdr, warn };
 }
@@ -1200,7 +1209,7 @@ function choosePerm(c) {
 async function runMeta(s) {
   switch (s.t) {
     case 'pause': await wait(s.secs * 1000); break;
-    case 'title': st.title = s.text; if (st.titled && st.curItem) { st.curItem.t = s.text; renderRecents(); } renderTitle(); break;
+    case 'title': if (!st.titled) st.title = s.text; break; // shown with the session name; never renames it
     case 'info': {
       // Inside a turn it goes in place (before whatever comes next), not at the end of the thread.
       const el = h(`<div class="info">${inline(s.text)}</div>`);

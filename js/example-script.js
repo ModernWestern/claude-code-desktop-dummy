@@ -13,6 +13,7 @@ window.EXAMPLE_SCRIPT = `
 @user: ModernWestern
 @plan: Claude Max
 @cwd: ~/projects/space-facts
+// Session name: like in Claude, once set it never changes during the session
 @title: Black hole explanation
 // Starting model and effort: low · medium · high · xhigh · max · ultracode
 @model: haiku
@@ -92,9 +93,7 @@ claude: Done. Physics no longer exists, so technically black holes don't either.
 // ── 5. BONUS ROUND ── everything else the simulator can do
 // [pause N] = wait N seconds (nothing happens on screen)
 [pause 2]
-// [title …] = renames the session · [context N%] and [mode plan|edits|bypass|normal]
-// only change the Claude Code footer
-[title Physics rescue attempt]
+// [context N%] and [mode plan|edits|bypass|normal] only change the Claude Code footer
 [context 4%]
 
 user: ok... at least fix my astronomy homework

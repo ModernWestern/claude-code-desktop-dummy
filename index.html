@@ -191,7 +191,7 @@ claude: A black hole is a **pothole**.
         <tr><td><code>[pause 2]</code></td><td>Waits 2 seconds.</td></tr>
         <tr><td><code>/compact</code> · <code>[compact]</code></td><td>“Compacting our conversation…” animation.</td></tr>
         <tr><td><code>/clear</code> · <code>[clear]</code></td><td>The cursor clicks “New”.</td></tr>
-        <tr><td><code>[title Text]</code> · <code>@title</code></td><td>Session title (shown after the first answer and in the sidebar).</td></tr>
+        <tr><td><code>[title Text]</code> · <code>@title</code></td><td>Session title (shown after the first answer and in the sidebar). Without them, the first message names the session. Once named, it never changes: a later <code>[title]</code> is ignored until <code>/clear</code> starts a new session.</td></tr>
         <tr><td><code>@greeting</code></td><td>Home screen greeting (default “What’s up next, &lt;user&gt;?”).</td></tr>
         <tr><td><code>@sessions</code> … <code>@moby</code></td><td>Numbers on the home screen stats card: <code>@sessions</code>, <code>@messages</code>, <code>@totaltokens</code>, <code>@activedays</code>, <code>@peakhour</code>, <code>@favoritemodel</code>, <code>@moby</code>.</td></tr>
       </table>

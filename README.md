@@ -78,7 +78,7 @@ claude: After an exhaustive analysis… it's a pothole, but in `dark mode`.
 | `todos:` | Checklist (`[x]` done · `[>]` in progress · `[ ]` pending) |
 | `permission: Bash(cmd) \| description` + `[choose 1-3]` | Permission card: allow once / always / deny |
 | `[error]` · `[info text]` · `[interrupt]` | Overloaded error · gray system line · interrupted answer |
-| `[pause 2]` · `[title …]` · `/compact` · `/clear` | Wait · rename session · compaction · new session |
+| `[pause 2]` · `[title …]` · `/compact` · `/clear` | Wait · session title (set once, never changes during the session) · compaction · new session |
 | `@greeting`, `@sessions`, `@messages`, `@totaltokens`, `@activedays`, `@peakhour`, `@favoritemodel`, `@moby` | Desktop home screen text and stats |
 | `[mode plan]` · `[context 4%]` | Terminal footer only |
 
