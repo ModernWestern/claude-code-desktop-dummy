@@ -2,8 +2,11 @@
 
 **Are you a content creator? This is a Claude Code session so your examples or explainer videos don't cost you tokens!**
 
-▶ **Open it in your browser:** https://modernwestern.github.io/claude-code-desktop-dummy/
-&nbsp;&nbsp;·&nbsp;&nbsp;Terminal version: https://modernwestern.github.io/claude-code-desktop-dummy/terminal.html
+▶ **Open it in your browser:** 
+
+[Desktop 🖥️](https://modernwestern.github.io/claude-code-desktop-dummy/)
+
+[Terminal ⬛](https://modernwestern.github.io/claude-code-desktop-dummy/terminal.html)
 
 A pixel-faithful dummy of the Claude Code interface that plays a **script you write**. You decide exactly what you type and what "Claude" answers, so you can record tutorials, demos, sketches and parodies, rehearse them as many times as you want, and never spend a single token. No AI runs here: everything on screen comes from your script.
 
