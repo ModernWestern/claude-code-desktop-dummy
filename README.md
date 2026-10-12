@@ -17,7 +17,7 @@ The interface is based on **Claude Code Desktop version 2.31226.1** (Claude desk
 | File | What it looks like |
 |---|---|
 | [`index.html`](https://modernwestern.github.io/claude-code-desktop-dummy/) | **Claude Code Desktop**: sidebar with session groups, home screen with usage stats and Clawd, model picker, effort slider (including the animated Ultracode bar), thinking blocks, tool rows, permission cards… |
-| [`terminal.html`](https://modernwestern.github.io/claude-code-desktop-dummy/terminal.html) | **Claude Code in a terminal**: welcome box, `>` prompt, ✻ spinner with its verbs, `/model` picker, `⎿` tool output, permission prompts, `ultrathink` in rainbow colors… |
+| [`terminal.html`](https://modernwestern.github.io/claude-code-desktop-dummy/terminal.html) | **Claude Code in a terminal**: welcome box, `>` prompt, ✻ spinner with its verbs, `/model` picker, `⎿` tool output, permission prompts, Ultracode effort in purple… |
 
 Both read the same script format, and if you open them from the same place in the same browser they share the script.
 
@@ -53,9 +53,9 @@ user: claude what are black holes
 claude: A black hole is most likely one of those **potholes** in the street.
 
 // Text inside { } is never typed: it tells the model picker what to choose.
-user: /model {opus max}
+user: /model {opus ultracode}
 
-user: ultrathink explain what a black hole REALLY is in physics
+user: Claude, explain what a black hole REALLY is in physics
 [think 9 Consulting Stephen Hawking]
 [tokens 4.2M]
 reasoning: [Concluded it is a pothole, just far away] Physics studies things that exist...
@@ -68,7 +68,7 @@ claude: After an exhaustive analysis… it's a pothole, but in `dark mode`.
 | Directive | Effect |
 |---|---|
 | `user:` / `claude:` | Your message / Claude's answer (multi-line, Markdown: bold, lists, tables, code…) |
-| `user: /model {opus max}` | Animated model picker; effort `low · medium · high · xhigh · max · ultracode` |
+| `user: /model {opus ultracode}` | Animated model picker; effort `low · medium · high · xhigh · max · ultracode` |
 | `user: /effort ultracode` | Changes only the effort |
 | `[think 5 Phrase]` | Claude thinks for 5 s, optionally showing a custom phrase |
 | `[tokens 3.5M]` | Token counter climbs to that number ("Worked for 9s · 3.5M tokens") |
@@ -84,9 +84,24 @@ claude: After an exhaustive analysis… it's a pothole, but in `dark mode`.
 
 The full reference lives in the **Syntax** tab of the panel. Spanish keywords (`yo:`, `[pensar]`, `razonamiento:`…) also work.
 
+## Project structure
+
+```text
+index.html              Claude Code Desktop page (markup only)
+terminal.html           Claude Code terminal page (markup only)
+css/desktop.css         Desktop styles
+css/terminal.css        Terminal styles
+js/desktop.js           Desktop engine: script parser, playback, model/effort pickers, fake cursor…
+js/terminal.js          Terminal engine
+js/clawd-frames.js      Pixel frames of Clawd, the mascot on the Desktop home screen
+js/example-script.js    The built-in example script ("Black holes"), shared by both pages
+```
+
+To change the example that loads on the first visit, edit `js/example-script.js`: it's plain script text between backticks.
+
 ## Run it locally
 
-It's two self-contained HTML files with no build step and no dependencies. Download the repo and double-click `index.html`.
+No build step and no dependencies. Download the repo and double-click `index.html` (or `terminal.html`).
 
 ## Credits and disclaimer
 
