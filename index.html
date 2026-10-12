@@ -1,0 +1,2334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg stroke='%23D97757' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M16 4v24M4 16h24M7.5 7.5l17 17M24.5 7.5l-17 17'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFFFF;--side:#FBFBFA;--bg0:#FFFFFF;--hov:#F1F1EF;--sel:#EDEDEA;--bub:#F2F2F0;
+  --t0:#1F1F1E;--t1:#2B2B29;--t2:#5E5E5A;--t3:#8C8C88;--t4:#A8A8A4;
+  --bd:#E6E6E3;--bd2:#D9D9D5;
+  --accent:#D97757;--blue:#2F7BEB;--check:#4A6E9B;--warn:#B26B12;--ultra:#6E56CF;
+  --codei:#B3261E;--codeibg:#F6F6F4;--codebg:#F7F7F5;
+  --dbg:#FCEDED;--dbd:#EDB4B4;--dt:#9E2B2B;
+  --track:#E6E6E6;--trackF:#D2D2D0;--statsBg:#F5F5F3;--tileBg:#EBEBE8;--heat0:#E4E4E1;--trackU:#F2F0F8;--tdot:#A3A39F;--ttick:#8E8E8A;
+  --hk:#D73A49;--hs:#0A6B3D;--hn:#005CC5;--hc:#8A8A85;--hf:#6F42C1;--ht:#005CC5;
+  --sans:"Anthropic Sans","Segoe UI Variable Text","Segoe UI Variable","Segoe UI",system-ui,sans-serif;--serif:var(--sans);--mono:"JetBrains Mono","Cascadia Mono",Consolas,monospace;
+  --zoom:1;--sideW:clamp(250px,19.25vw,400px);--colW:clamp(460px,34.7vw,860px);--compW:clamp(500px,37.5vw,920px);
+}
+html.dark{
+  --bg:#1F1F1E;--side:#1A1A19;--bg0:#262625;--hov:#2C2C2A;--sel:#30302E;--bub:#2E2E2C;
+  --t0:#F2F2EF;--t1:#E3E3DF;--t2:#B4B4AF;--t3:#8E8E89;--t4:#6E6E6A;
+  --bd:#2F2F2D;--bd2:#3B3B38;
+  --check:#8FB3E0;--warn:#E3A64B;--ultra:#A996F5;
+  --codei:#F2958E;--codeibg:#2A2A28;--codebg:#232322;
+  --dbg:#3A2322;--dbd:#7A3B38;--dt:#F4B4AE;
+  --track:#323230;--trackF:#4A4A47;--statsBg:#262625;--tileBg:#2E2E2C;--heat0:#353533;--trackU:#2C2838;--tdot:#7B7B76;--ttick:#8E8E89;
+  --hk:#FF7B8B;--hs:#A5D6A7;--hn:#B39DDB;--hc:#7C7B75;--hf:#82AAFF;--ht:#7FDBCA;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{font-size:calc(14px * var(--zoom))}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg)}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+svg.i{width:1.1rem;height:1.1rem;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ───────── Window ───────── */
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+#stage.framed{background:radial-gradient(120% 120% at 15% 0%,#3a4766 0%,#181c27 55%,#0b0d12 100%)}
+#win{position:relative;display:flex;flex-direction:column;width:100%;height:100%;background:var(--bg);overflow:hidden;font-family:var(--sans);color:var(--t0);-webkit-font-smoothing:antialiased}
+#stage.framed #win{width:calc(100vw - 72px);height:calc(100vh - 72px);border-radius:8px;box-shadow:0 26px 80px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.12)}
+#stage.f-mac #win{border-radius:11px}
+
+/* Top bar */
+#topbar{flex:none;height:2.6rem;display:flex;align-items:center;user-select:none}
+.tb-left{width:var(--sideW);flex:none;height:100%;display:flex;align-items:center;gap:.15rem;padding:0 .5rem 0 .55rem;background:var(--side);border-right:1px solid var(--bd)}
+.tb-left .sp,.tb-main .sp{flex:1}
+.tbi{width:1.95rem;height:1.95rem;display:grid;place-items:center;border-radius:.4rem;color:var(--t2)}
+.tbi svg.i{width:1.05rem;height:1.05rem}
+.seg2{display:flex;gap:2px;padding:2px;border-radius:.5rem;background:var(--hov)}
+.seg2 .tbi{width:1.75rem;height:1.6rem;border-radius:.35rem;color:var(--t3)}
+.seg2 .tbi.on{background:var(--bg0);color:var(--t1);box-shadow:0 0 0 1px var(--bd2)}
+.lights{display:none;gap:8px;margin-right:.5rem}
+.lights i{display:block;width:12px;height:12px;border-radius:50%}
+.lights i:nth-child(1){background:#ff5f57}.lights i:nth-child(2){background:#febc2e}.lights i:nth-child(3){background:#28c840}
+#stage.f-mac .lights{display:flex}
+#stage.f-mac #winCtl{display:none}
+.tb-main{flex:1;min-width:0;height:100%;display:flex;align-items:center;gap:.35rem;padding-left:1rem}
+.tb-ico{display:grid;color:var(--t1)}
+.tb-ico svg.i{width:1.05rem;height:1.05rem}
+#titleText{font-size:1rem;font-weight:500;color:var(--t0);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:.35rem}
+.tb-chev{display:grid;color:var(--t2)}
+.tb-chev svg.i{width:.95rem;height:.95rem}
+.badge2{margin-left:.35rem;padding:.12rem .4rem;border-radius:.35rem;background:var(--hov);font-size:.85rem;color:var(--t2);white-space:nowrap}
+#winCtl{display:flex;margin-left:.75rem;height:100%}
+#winCtl span{width:3.2rem;height:100%;display:grid;place-items:center;color:var(--t2)}
+#winCtl svg.i{width:1rem;height:1rem;stroke-width:1.3}
+
+#app{flex:1;min-height:0;display:flex}
+
+/* ───────── Sidebar ───────── */
+#side{width:var(--sideW);flex:none;display:flex;flex-direction:column;background:var(--side);border-right:1px solid var(--bd);padding:.35rem .55rem .5rem}
+#side.hide,.tb-left.hide{display:none}
+.search{display:flex;align-items:center;gap:.5rem;height:2.15rem;padding:0 .6rem;border:1px solid var(--bd2);border-radius:.45rem;background:var(--bg0);color:var(--t3);font-size:1rem}
+.search svg.i{width:1rem;height:1rem}
+.nav{display:flex;flex-direction:column;margin-top:.55rem}
+.nav-item{display:flex;align-items:center;gap:.6rem;height:2.05rem;padding:0 .55rem;border-radius:.45rem;font-size:1.05rem;color:var(--t1)}
+.nav-item svg.i{width:1.05rem;height:1.05rem;color:var(--t2)}
+.nav-item.more,.nav-item.more svg.i{color:var(--t3)}
+.nav-item.hov,.nav-item:hover{background:var(--hov)}
+#sideScroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--bd2) transparent;margin-right:-.3rem;padding-right:.3rem}
+#sideScroll>.nav{margin-top:0}
+#groups{margin-top:1.35rem;display:flex;flex-direction:column}
+.grp{display:flex;align-items:center;height:2.35rem;padding:0 .3rem 0 .55rem;border-radius:.45rem;font-size:.95rem;color:var(--t2)}
+.grp .gn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grp .gc{display:grid;margin-left:.2rem;color:var(--t3)}
+.grp .gc svg.i{width:.85rem;height:.85rem}
+.grp .sp{flex:1}
+.grp .ga{display:flex;gap:.2rem;color:var(--t2)}
+.grp .ga span{width:1.6rem;height:1.6rem;display:grid;place-items:center}
+.grp .ga svg.i{width:1.05rem;height:1.05rem}
+.grp.cur{background:var(--sel);color:var(--t0)}
+
+.ses{display:flex;align-items:center;gap:.65rem;flex:none;height:2.05rem;padding:0 .55rem;border-radius:.45rem;font-size:1.05rem;color:var(--t1)}
+.ses .dot{flex:none;width:.42rem;height:.42rem;border-radius:50%;border:1.3px solid var(--t4)}
+.ses .dot.f{background:var(--t4)}
+.ses .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ses.cur{background:var(--sel);color:var(--t0)}
+.ses.fresh{animation:fadein .5s ease}
+.grp{flex:none}
+.grp.open .gc{display:none}
+#main.empty ~ * {}
+.nav-item.on{background:var(--sel)}
+.grp.fresh{animation:fadein .5s ease}
+.side-foot{display:flex;align-items:center;gap:.5rem;border-top:1px solid var(--bd);margin:.4rem -.55rem 0;padding:.75rem 1rem .25rem}
+.side-foot .av svg{width:1.15rem;height:1.15rem}
+.uname{font-size:1rem;color:var(--t1);white-space:nowrap}
+.uplan{color:var(--t3)}
+.side-foot .sp{flex:1}
+.side-foot .ic2{display:grid;color:var(--t2)}
+.side-foot .ic2 svg.i{width:.95rem;height:.95rem}
+
+/* ───────── Main area ───────── */
+#main{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg)}
+#scroll{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bd2) transparent}
+#thread{width:var(--colW);max-width:calc(100% - 3rem);margin:0 auto;padding:1.25rem 0 2rem}
+#center{flex:none;display:flex;flex-direction:column;align-items:center;padding:0 1.5rem}
+#main.empty #scroll{display:none}
+#main.empty #center{flex:1;justify-content:center;padding-bottom:9vh}
+#greet{display:none;align-items:center;gap:.75rem;margin-bottom:1.75rem}
+#main.empty #greet{display:flex}
+#greet .spark{width:2.2rem;height:2.2rem}
+#greet h1{margin:0;font:400 2.2rem/1.15 var(--serif);letter-spacing:-.02em;color:var(--t1)}
+#composerWrap{width:var(--compW);max-width:100%;padding-bottom:.6rem}
+#chips{display:none;flex-wrap:wrap;justify-content:center;gap:.5rem;margin-top:1rem}
+#main.empty #chips.on{display:flex}
+.chip{display:flex;align-items:center;gap:.4rem;height:2rem;padding:0 .75rem;border:1px solid var(--bd2);border-radius:.5rem;font-size:.95rem;color:var(--t2)}
+.chip svg.i{width:1rem;height:1rem;color:var(--t3)}
+
+/* Home screen (new session) */
+#home{display:none;flex:1;min-height:0;overflow-y:auto;padding:2.15rem 1.5rem 1rem}
+#main.empty #home{display:block}
+#main.empty #center{flex:none;justify-content:flex-start;padding-bottom:0}
+.home-col{width:var(--compW);max-width:100%;margin:0 auto}
+.hgreet{display:flex;align-items:center;gap:.55rem;margin-left:-.1rem}
+.hgreet .spark{width:1.35rem;height:1.35rem}
+.hgreet h1{margin:0;font:400 1.5rem/1.3 var(--sans);letter-spacing:-.01em;color:var(--t0)}
+.stats{width:min(100%,33.5rem);margin:1.85rem 0 0 .9rem;padding:.85rem .95rem .95rem;border-radius:.7rem;background:var(--statsBg)}
+.st-tabs{display:flex;align-items:center;gap:.25rem;font-size:.97rem;color:var(--t3)}
+.st-tabs span{padding:.15rem .4rem;border-radius:.35rem}
+.st-tabs .on{color:var(--t0);font-weight:500;background:var(--bg0);box-shadow:0 0 0 1px var(--bd)}
+.st-tabs .sp{flex:1}
+.st-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem;margin-top:.9rem}
+.st-tile{background:var(--tileBg);border-radius:.4rem;padding:.4rem .3rem .45rem}
+.st-tile .k{font-size:.92rem;color:var(--t3)}
+.st-tile .v{margin-top:.15rem;font-size:1rem;font-weight:600;color:var(--t0)}
+.st-tile .v.n{font-weight:500}
+.heat{display:grid;grid-template-columns:repeat(26,1fr);grid-auto-rows:auto;gap:3px;margin-top:.85rem}
+.heat i{display:block;aspect-ratio:1;border-radius:2px;background:var(--heat0)}
+.heat i.l1{background:#9EBBF0}.heat i.l2{background:#6597EA}.heat i.l3{background:#3B73DD}
+.heat i.x{visibility:hidden}
+.st-note{margin-top:.85rem;font-size:.85rem;color:var(--t3)}
+#ctx{display:none;align-items:center;gap:.5rem;margin:0 0 .55rem .1rem}
+#main.empty #ctx{display:flex}
+.ctxb{display:flex;align-items:center;gap:.4rem;height:1.75rem;padding:0 .55rem;border:1px solid var(--bd2);border-radius:.45rem;font-size:.97rem;color:var(--t1);background:var(--bg0)}
+.ctxb svg.i{width:.95rem;height:.95rem;color:var(--t2)}
+#composerWrap{position:relative}
+/* Clawd: 34×23 half-units; its feet rest on the top edge of the chat box. */
+#composer{position:relative}
+.clawd{display:none;position:absolute;bottom:100%;right:.45rem;width:4.42rem;height:2.99rem;image-rendering:pixelated;pointer-events:none}
+#main.empty .clawd{display:block}
+#win.empty .tb-main > :not(#winCtl):not(.sp){visibility:hidden}
+#busy .ring.idle{border-color:var(--bd2);animation:none}
+
+/* Composer */
+#composer{display:flex;align-items:flex-start;gap:.5rem;background:var(--bg0);border:1px solid var(--bd2);border-radius:.85rem;padding:.6rem .7rem .6rem .85rem;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+#cInput{flex:1;min-width:0;min-height:1.5rem;max-height:12rem;overflow:hidden;font-size:1.07rem;line-height:1.5;color:var(--t0);white-space:pre-wrap;overflow-wrap:anywhere}
+#cPh{color:var(--t3)}
+#caret{display:inline-block;width:1.5px;height:1.2em;margin:0 1px 0 0;background:var(--t0);vertical-align:-.25em;animation:caret 1.06s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+#sendBtn{flex:none;width:1.6rem;height:1.6rem;margin-top:-.05rem;display:grid;place-items:center;border-radius:.35rem;color:var(--t3);transition:transform .1s}
+#sendBtn svg.i{width:1rem;height:1rem}
+#sendBtn.stop{color:var(--t0)}
+#sendBtn.stop svg.i{width:1.15rem;height:1.15rem}
+#sendBtn.press{transform:scale(.88)}
+.c-row{display:flex;align-items:center;gap:.25rem;margin-top:.45rem;padding:0 .45rem;font-size:.95rem;color:var(--t2)}
+.c-row .sp{flex:1}
+.cb2{display:grid;place-items:center;width:1.6rem;height:1.6rem;border-radius:.35rem;color:var(--t2)}
+.cb2 svg.i{width:1rem;height:1rem}
+.cb2.sm svg.i{width:.8rem;height:.8rem}
+.cb2.hov{background:var(--hov)}
+.c-row .auto{margin-left:.35rem;color:var(--t2)}
+#modelBtn,#effortBtn{flex:none;white-space:nowrap;height:1.8rem;display:flex;align-items:center;gap:.3rem;padding:0 .45rem;border-radius:.4rem;font-size:.95rem;color:var(--t1)}
+#modelBtn:hover,#modelBtn.is-open,#modelBtn.hov,#effortBtn:hover,#effortBtn.is-open,#effortBtn.hov{background:var(--hov)}
+#effortWarn{display:flex}
+#effortWarn svg.i{width:.95rem;height:.95rem;color:var(--warn)}
+#busy{display:flex;align-items:center;gap:.4rem;margin-left:.3rem;font-size:.85rem;color:var(--t3);white-space:nowrap}
+#busy .ring{width:1rem;height:1rem;border-radius:50%;border:2px solid color-mix(in srgb,var(--blue) 22%,transparent);border-top-color:var(--blue);animation:spin .9s linear infinite}
+
+/* Model menu */
+#menu{position:fixed;z-index:30;min-width:15.5rem;max-width:22rem;padding:.375rem;background:var(--bg0);border:1px solid var(--bd2);border-radius:.8rem;box-shadow:0 .75rem 2.5rem rgba(0,0,0,.12),0 .125rem .5rem rgba(0,0,0,.05);font-family:var(--sans)}
+html.dark #menu{box-shadow:0 .75rem 2.5rem rgba(0,0,0,.5)}
+.mi{display:flex;align-items:center;gap:.75rem;padding:.5rem .65rem;border-radius:.5rem}
+.mi:hover,.mi.hov{background:var(--hov)}
+.mt{flex:1;min-width:0}
+.mn{font-size:1.07rem;color:var(--t0)}
+.mc{min-width:1rem;color:var(--check);display:grid;place-items:center}
+.mc .num{font-size:1rem;color:var(--t3)}
+.mc svg.i{width:1.05rem;height:1.05rem;stroke-width:2}
+.badge{display:inline-block;margin-left:.5rem;padding:.0625rem .4rem;border-radius:.3125rem;background:var(--hov);font-size:.85rem;color:var(--t2);vertical-align:1px}
+.msep{height:1px;background:var(--bd);margin:.375rem .25rem}
+.msec{font-size:1rem;color:var(--t3);padding:.375rem .65rem .125rem}
+.sw{width:2.2rem;height:1.25rem;border-radius:999px;background:var(--bd2);position:relative;transition:background .2s;flex:none}
+.sw i{position:absolute;top:.15rem;left:.15rem;width:.95rem;height:.95rem;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .2s}
+.sw.on{background:var(--blue)}
+.sw.on i{transform:translateX(.95rem)}
+
+/* Effort picker */
+#effortPop{position:fixed;z-index:30;width:21rem;padding:1.1rem 1.2rem .95rem;background:var(--bg0);border:1px solid var(--bd2);border-radius:.9rem;box-shadow:0 .75rem 2.5rem rgba(0,0,0,.12),0 .125rem .5rem rgba(0,0,0,.05);font-family:var(--sans);user-select:none;-webkit-user-select:none}
+html.dark #effortPop{box-shadow:0 .75rem 2.5rem rgba(0,0,0,.5)}
+.ep-h{display:flex;align-items:center;gap:.5rem;font-size:1.07rem}
+.ep-t{color:var(--t3)}
+.ep-v{color:var(--t0);font-weight:500}
+.ep-v.ultra{color:var(--ultra)}
+.ep-q{margin-left:auto;display:grid;color:var(--t3)}
+.ep-q svg.help{width:1.2rem;height:1.2rem;display:block}
+.ep-ends{display:flex;justify-content:space-between;margin:1rem 0 .55rem;font-size:1rem;color:var(--t3)}
+.ep-track{position:relative;height:1.9rem;border-radius:.53rem;background:var(--track);cursor:pointer;touch-action:none;outline:none;-webkit-tap-highlight-color:transparent}
+.ep-fill{position:absolute;left:0;top:0;bottom:0;border-radius:.53rem;background:var(--trackF);transition:width .09s ease-out}
+.ep-track.ultra .ep-fill{display:none}
+.ep-track canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:.53rem;display:none}
+.ep-track.ultra{background:var(--trackU)}
+.ep-track.ultra canvas{display:block}
+.ep-dot{position:absolute;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:var(--tdot)}
+.ep-tick{position:absolute;top:50%;width:2px;height:.8rem;margin:-.4rem 0 0 -1px;border-radius:1px;background:var(--ttick)}
+.ep-thumb{position:absolute;top:0;width:1.52rem;height:100%;margin:0 0 0 -.76rem;border-radius:.53rem;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.14);transition:left .09s ease-out}
+.ep-rec{position:relative;height:1.35rem;margin-top:.4rem;font-size:1rem;color:var(--t3)}
+.ep-rec span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.ep-warn{display:flex;gap:.5rem;margin-top:.7rem;font-size:1rem;line-height:1.45;color:var(--warn)}
+.ep-warn svg.i{width:1.05rem;height:1.05rem;margin-top:.15rem}
+
+/* ───────── Messages ───────── */
+.m-user{display:flex;justify-content:flex-end;margin:1.6rem 0 1.3rem;animation:fadein .25s ease}
+.bubble{max-width:min(36rem,85%);background:var(--bub);border-radius:.85rem;padding:.55rem .9rem;font-size:1.07rem;line-height:1.5;color:var(--t0);white-space:pre-wrap;overflow-wrap:anywhere}
+.turn{margin:0 0 1rem}
+.blocks>*+*{margin-top:.85rem}
+.b-text{font-family:var(--serif);font-size:1.07rem;line-height:1.43;color:var(--t0);overflow-wrap:anywhere}
+.b-text>:first-child{margin-top:0}.b-text>:last-child{margin-bottom:0}
+.b-text p{margin:0 0 .75em}
+.b-text h1,.b-text h2,.b-text h3{color:var(--t0);margin:1.1em 0 .45em;line-height:1.3}
+.b-text h1{font-size:1.35rem;font-weight:600}.b-text h2{font-size:1.2rem;font-weight:600}.b-text h3{font-size:1.07rem;font-weight:600}
+.b-text ul,.b-text ol{margin:0 0 .75em;padding-left:2.1em}
+.b-text li{margin:.15em 0;padding-left:.15em}
+.b-text li::marker{color:var(--t3)}
+.b-text strong{font-weight:600;color:var(--t0)}
+.b-text code{font-family:var(--mono);font-size:.87em;color:var(--codei);background:var(--codeibg);border:1px solid var(--bd);border-radius:.3rem;padding:.05em .3em}
+.b-text pre{margin:0 0 .75em;background:var(--codebg);border:1px solid var(--bd);border-radius:.6rem;overflow:hidden}
+.b-text pre .ch{display:flex;justify-content:space-between;padding:.4rem .85rem;font:.85rem var(--sans);color:var(--t3);border-bottom:1px solid var(--bd)}
+.b-text pre code{display:block;background:none;border:0;color:var(--t1);padding:.7rem .85rem;font-size:.9rem;line-height:1.6;white-space:pre;overflow-x:auto}
+.b-text blockquote{margin:0 0 .75em;padding-left:1em;border-left:3px solid var(--bd2);color:var(--t2)}
+.b-text hr{border:0;border-top:1px solid var(--bd2);margin:1.2em 0}
+.b-text a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.tbl{margin:0 0 .75em;overflow-x:auto}
+.b-text table{border-collapse:collapse;font-size:.97em;min-width:60%}
+.b-text th{font-weight:600;color:var(--t0);text-align:left;padding:.45em .9em .45em 0;border-bottom:1px solid var(--bd2)}
+.b-text td{padding:.45em .9em .45em 0;border-bottom:1px solid var(--bd)}
+.b-text tr:last-child td{border-bottom:0}
+.hl-kw{color:var(--hk)}.hl-str{color:var(--hs)}.hl-num{color:var(--hn)}.hl-com{color:var(--hc);font-style:italic}.hl-fn{color:var(--hf)}.hl-type{color:var(--ht)}
+
+/* Gray rows: thinking, tools, token summary */
+.b-think .th-head,.b-tool .tl-head{display:inline-flex;align-items:center;gap:.3rem;font-size:1.07rem;color:var(--t3);text-align:left;max-width:100%}
+.th-head svg.i,.tl-head svg.i{width:.85rem;height:.85rem}
+.tl-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-label.mono{font-family:var(--mono);font-size:.95rem}
+.tl-meta{color:var(--t4)}
+.tl-meta.err{color:var(--dt)}
+.chev{transition:transform .2s}
+.open>.th-head .chev,.open>.tl-head .chev{transform:rotate(90deg)}
+.th-body,.tl-body{display:none;margin-top:.5rem;padding:.65rem .85rem;border:1px solid var(--bd);border-radius:.6rem;background:var(--codebg);font-size:.97rem;line-height:1.55;color:var(--t2);white-space:pre-wrap;overflow-wrap:anywhere}
+.tl-body{font-family:var(--mono);font-size:.9rem;max-height:16rem;overflow-y:auto}
+.b-think.open .th-body,.b-tool.open .tl-body{display:block}
+.tl-body .dl{display:block}
+.tl-body .add{background:color-mix(in srgb,#2ea043 16%,transparent)}
+.tl-body .del{background:color-mix(in srgb,#f85149 16%,transparent)}
+.mini-spin{width:.85rem;height:.85rem;border-radius:50%;border:1.6px solid var(--bd2);border-top-color:var(--t2);animation:spin .8s linear infinite;flex:none}
+.shimmer{background:linear-gradient(90deg,var(--t3) 0%,var(--t3) 38%,var(--t0) 50%,var(--t3) 62%,var(--t3) 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent!important;animation:shim 1.8s linear infinite}
+@keyframes shim{from{background-position:100% 0}to{background-position:-150% 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.status{display:flex;align-items:center;gap:.55rem;font-size:1.07rem;color:var(--t3)}
+.status .sl{color:var(--t1)}
+.th-time{color:var(--t3);margin-left:.15rem}
+/* "Thinking" indicators: animated orange dots */
+.dots{position:relative;display:inline-block;flex:none;width:1.15rem;height:1rem}
+.dots i{position:absolute;width:4px;height:4px;border-radius:50%;background:var(--accent)}
+.dots.wave i{top:calc(50% - 2px)}
+.dots.wave i:nth-child(1){left:0}.dots.wave i:nth-child(2){left:calc(50% - 2px)}.dots.wave i:nth-child(3){right:0}
+.dots.wave i{animation:dWave 1.2s ease-in-out infinite}
+.dots.wave i:nth-child(2){animation-delay:.16s}.dots.wave i:nth-child(3){animation-delay:.32s}
+@keyframes dWave{0%,55%,100%{transform:translateY(0)}25%{transform:translateY(-4px)}}
+.dots.pinch i{top:calc(50% - 2px)}
+.dots.pinch i:nth-child(1){left:0;animation:dPinchL 1.3s ease-in-out infinite}
+.dots.pinch i:nth-child(2){left:calc(50% - 2px)}
+.dots.pinch i:nth-child(3){right:0;animation:dPinchR 1.3s ease-in-out infinite}
+@keyframes dPinchL{0%,100%{transform:translateX(0)}45%,55%{transform:translateX(calc(.575rem - 2px))}}
+@keyframes dPinchR{0%,100%{transform:translateX(0)}45%,55%{transform:translateX(calc(-.575rem + 2px))}}
+.dots.fold{width:.95rem;height:.95rem}
+.dots.fold i{animation:dFold 1.4s cubic-bezier(.5,0,.3,1) infinite}
+.dots.fold i:nth-child(1){left:0;top:0;--fx:1;--fy:1}
+.dots.fold i:nth-child(2){right:0;top:0;--fx:-1;--fy:1}
+.dots.fold i:nth-child(3){left:0;bottom:0;--fx:1;--fy:-1}
+.dots.fold i:nth-child(4){right:0;bottom:0;--fx:-1;--fy:-1}
+@keyframes dFold{0%,100%{transform:translate(0,0)}45%,55%{transform:translate(calc(var(--fx) * (.475rem - 2px)),calc(var(--fy) * (.475rem - 2px))) scale(.85)}}
+.usage{font-size:1rem;color:var(--t3)}
+
+/* Permission */
+.perm{border:1px solid var(--bd2);border-radius:.8rem;background:var(--bg0);padding:.95rem 1rem .85rem;animation:fadein .25s ease}
+.perm-h{display:flex;align-items:center;gap:.5rem;font-size:1.07rem;font-weight:600;color:var(--t0)}
+.perm-h svg.i{color:var(--accent)}
+.perm-cmd{margin:.7rem 0 .35rem;padding:.5rem .75rem;border-radius:.5rem;background:var(--codebg);border:1px solid var(--bd);font:.92rem/1.5 var(--mono);color:var(--t1);white-space:pre-wrap;overflow-wrap:anywhere}
+.perm-d{font-size:.97rem;color:var(--t3)}
+.perm-b{display:flex;justify-content:flex-end;gap:.5rem;margin-top:.85rem}
+.pb{height:2.1rem;padding:0 .9rem;border-radius:.5rem;border:1px solid var(--bd2);background:var(--bg0);font-size:.97rem;font-weight:500;color:var(--t1)}
+.pb.pri{background:var(--t0);color:var(--bg);border-color:var(--t0)}
+.pb.hov{filter:brightness(.93)}
+html.dark .pb.hov{filter:brightness(1.15)}
+
+/* Other blocks */
+.err-box{border:1px solid var(--dbd);background:var(--dbg);color:var(--dt);border-radius:.7rem;padding:.75rem 1rem;font-size:1rem;line-height:1.5}
+.note{font-size:1rem;color:var(--t3);font-style:italic}
+.info{font-size:1rem;color:var(--t3);text-align:center;margin:.75rem 0}
+.todo-card{border:1px solid var(--bd);border-radius:.7rem;padding:.75rem 1rem;font-size:1rem;background:var(--codebg)}
+.todo-card .tt{font-weight:600;color:var(--t1);margin-bottom:.375rem}
+.todo{display:flex;align-items:center;gap:.5rem;padding:.2rem 0;color:var(--t1)}
+.todo .bx{width:1rem;height:1rem;border-radius:.25rem;border:1.5px solid var(--bd2);flex:none;display:grid;place-items:center}
+.todo.done{color:var(--t3);text-decoration:line-through}
+.todo.done .bx{background:var(--t2);border-color:var(--t2);color:var(--bg)}
+.todo.done .bx svg.i{width:.7rem;height:.7rem;stroke-width:3}
+.todo.prog .bx{border-color:var(--accent);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite}
+.compact-card{display:flex;align-items:center;justify-content:center;gap:.6rem;margin:1.25rem 0;font-size:1rem;color:var(--t3)}
+.divider{display:flex;align-items:center;gap:.75rem;margin:1.5rem 0;font-size:.9rem;color:var(--t3)}
+.divider:before,.divider:after{content:"";flex:1;height:1px;background:var(--bd2)}
+.foot{display:none}
+
+/* Claude spark */
+svg.spark{display:block;overflow:visible}
+svg.spark line{stroke:var(--accent);stroke-width:2.1;stroke-linecap:round;transform-origin:12px 12px}
+svg.spark.live{animation:spin 7s linear infinite}
+svg.spark.live line{animation:ray 1.25s ease-in-out infinite}
+@keyframes ray{0%,100%{transform:scale(1)}50%{transform:scale(.55)}}
+
+/* Fake cursor */
+#fakeCursor{position:fixed;left:0;top:0;z-index:70;width:22px;height:26px;pointer-events:none;opacity:0;transition:opacity .35s;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.35))}
+#fakeCursor.on{opacity:1}
+#fakeCursor svg{transition:transform .1s;transform-origin:3px 2px}
+#fakeCursor.click svg{transform:scale(.86)}
+body.nocursor,body.nocursor *{cursor:none!important}
+
+/* ───────── Toast and control panel (never part of the recording) ───────── */
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,8px);z-index:80;padding:7px 14px;border-radius:999px;background:rgba(20,20,22,.88);color:#eee;border:1px solid rgba(255,255,255,.12);font:12px system-ui,"Segoe UI",sans-serif;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#panel{position:fixed;top:0;right:0;bottom:0;z-index:90;width:min(480px,100vw);display:flex;flex-direction:column;background:#17171a;color:#e8e6e3;border-left:1px solid #2d2d33;box-shadow:-24px 0 60px rgba(0,0,0,.5);font:13px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;transform:translateX(105%);transition:transform .22s ease;visibility:hidden}
+#panel.open{transform:none;visibility:visible}
+#panel header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px}
+#panel header .ttl{display:flex;align-items:center;gap:9px;font-weight:600;font-size:14px}
+#panel .x{background:none;border:0;color:#9a9aa2;font-size:16px;cursor:pointer;padding:4px 8px;border-radius:6px}
+#panel .x:hover{background:#26262b;color:#fff}
+#panel nav{display:flex;gap:4px;padding:0 16px;border-bottom:1px solid #2a2a30}
+#panel nav button{background:none;border:0;border-bottom:2px solid transparent;color:#a3a3ab;padding:8px 10px;font:inherit;cursor:pointer}
+#panel nav button.on{color:#fff;border-bottom-color:#D97757}
+#panel section{display:none;flex:1;min-height:0;padding:14px 16px 16px;overflow:auto}
+#panel section.on{display:flex;flex-direction:column;gap:10px}
+#panel .seg{display:grid;grid-template-columns:repeat(3,1fr);background:#0f0f11;border:1px solid #2d2d33;border-radius:9px;padding:3px;gap:3px}
+#panel .seg button{background:none;border:0;border-radius:6px;color:#b9b9c0;padding:7px 4px;font:inherit;cursor:pointer}
+#panel .seg button.on{background:#2a2a31;color:#fff;box-shadow:inset 0 0 0 1px #3a3a42}
+#panel .hint{margin:0;color:#a9a9b1;font-size:12.5px}
+#panel textarea{width:100%;resize:none;background:#0d0d0f;color:#ecebe8;border:1px solid #2d2d33;border-radius:9px;padding:10px 12px;font:12.5px/1.55 "Cascadia Mono",Consolas,monospace;outline:none;tab-size:2}
+#panel textarea:focus{border-color:#55555f}
+#script{flex:1;min-height:220px}
+#panel .ins{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12px;color:#8e8e97}
+#panel .ins button{background:#24242a;color:#e8b6a3;border:1px solid #33333b;border-radius:6px;padding:3px 8px;font:12px "Cascadia Mono",Consolas,monospace;cursor:pointer}
+#panel .ins button:hover{background:#2c2c33}
+
+#panel .status{font-size:12px;color:#9fd6a8;min-height:18px}
+#panel .status .w{color:#f0b37e;display:block}
+#panel .btns{display:flex;gap:8px;flex-wrap:wrap}
+#panel button.btn{flex:1;min-width:0;background:#24242a;color:#ecebe8;border:1px solid #33333b;border-radius:8px;padding:8px 10px;font:inherit;cursor:pointer;white-space:nowrap}
+#panel button.btn:hover{background:#2c2c33}
+#panel button.btn.primary{background:#D97757;border-color:#D97757;color:#1a0f0b;font-weight:650}
+#panel button.btn.primary:hover{background:#e0866a}
+#panel .small button.btn{font-size:12px;padding:6px 8px}
+#panel .keys{font-size:11.5px;color:#8c8c95;line-height:1.7}
+#panel .swap{font-size:12.5px;color:#e39a7f;text-decoration:none}
+#panel .swap:hover{text-decoration:underline}
+#panel kbd{font:11px "Cascadia Mono",Consolas,monospace;background:#26262c;border:1px solid #393941;border-bottom-width:2px;border-radius:4px;padding:0 5px;color:#ddd}
+#panel .state{font-size:12px;color:#c9c9cf;display:flex;align-items:center;gap:7px}
+#panel .state i{width:8px;height:8px;border-radius:50%;background:#666;display:inline-block}
+#panel .state.play i{background:#4eba65}#panel .state.wait i{background:#D97757}#panel .state.pause i{background:#e0b341}
+#panel h4{margin:8px 0 2px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8e8e97;font-weight:600}
+#panel .f{display:grid;grid-template-columns:150px 1fr;align-items:center;gap:10px}
+#panel .f label{color:#c7c7cd}
+#panel .f .v{display:flex;align-items:center;gap:8px}
+#panel .f .v output{min-width:44px;text-align:right;color:#9b9ba3;font-variant-numeric:tabular-nums}
+#panel select,#panel input[type=text],#panel input[type=number]{width:100%;background:#0f0f11;color:#ecebe8;border:1px solid #2d2d33;border-radius:7px;padding:6px 8px;font:inherit;outline:none}
+#panel input[type=range]{flex:1;accent-color:#D97757}
+#panel .chk{display:flex;align-items:center;gap:9px;color:#c7c7cd;cursor:pointer}
+#panel .chk input{accent-color:#D97757;width:15px;height:15px}
+#panel #models,#panel #recentsTa{min-height:110px;font-size:12px}
+#panel .doc{font-size:12.8px;color:#d6d5d2}
+#panel .doc h3{margin:14px 0 6px;font-size:13px;color:#fff}
+#panel .doc h3:first-child{margin-top:0}
+#panel .doc p{margin:4px 0 8px;color:#b9b9c0}
+#panel .doc pre{margin:6px 0 10px;background:#0d0d0f;border:1px solid #2a2a30;border-radius:8px;padding:9px 11px;font:12px/1.55 "Cascadia Mono",Consolas,monospace;white-space:pre-wrap;color:#e9e7e3}
+#panel .doc code{font:12px "Cascadia Mono",Consolas,monospace;background:#26262c;border-radius:4px;padding:1px 5px;color:#f1c7b8}
+#panel .doc table{border-collapse:collapse;width:100%;margin:4px 0 10px}
+#panel .doc td{border-top:1px solid #2a2a30;padding:6px 6px 6px 0;vertical-align:top;color:#b9b9c0}
+#panel .doc td:first-child{white-space:nowrap;padding-right:10px}
+</style>
+</head>
+<body>
+<div id="stage"><div id="win">
+  <div id="topbar">
+    <div class="tb-left" id="tbLeft">
+      <span class="lights"><i></i><i></i><i></i></span>
+      <span class="tbi" data-ic="menu"></span><span class="tbi" data-ic="panel"></span><span class="tbi" data-ic="back"></span><span class="tbi" data-ic="fwd"></span>
+      <div class="sp"></div>
+      <div class="seg2"><span class="tbi" data-ic="chat"></span><span class="tbi on" data-ic="code"></span></div>
+    </div>
+    <div class="tb-main">
+      <span class="tb-ico" data-ic="laptop"></span><span id="titleText"></span><span class="tb-chev" data-ic="chev"></span><span class="badge2" id="folderBadge"></span>
+      <div class="sp"></div>
+      <span class="tbi" data-ic="terminal"></span><span class="tbi" data-ic="diff"></span><span class="tbi" data-ic="globe"></span><span class="tbi" data-ic="folder"></span><span class="tbi" data-ic="dots"></span>
+      <span id="winCtl"><span data-ic="min"></span><span data-ic="max"></span><span data-ic="x"></span></span>
+    </div>
+  </div>
+  <div id="app">
+    <aside id="side">
+      <div class="search"><span data-ic="search"></span><span data-l="search"></span></div>
+      <div class="nav">
+        <div class="nav-item new"><span data-ic="plus"></span><span data-l="newSession"></span></div>
+      </div>
+      <!-- Like the app: Search and New stay fixed; everything else scrolls with a single scrollbar. -->
+      <div id="sideScroll">
+        <div class="nav">
+          <div class="nav-item"><span data-ic="shapes"></span><span data-l="artifacts"></span></div>
+          <div class="nav-item"><span data-ic="briefcase"></span><span data-l="customize"></span></div>
+          <div class="nav-item more"><span data-ic="chevR"></span><span data-l="moreNav"></span></div>
+        </div>
+        <div id="groups"></div>
+      </div>
+      <div class="side-foot"><span class="av" id="avatar"></span><span class="uname"><span id="uname"></span><span class="uplan" id="uplan"></span></span><span class="ic2" data-ic="chev"></span><div class="sp"></div><span class="ic2" data-ic="bug"></span></div>
+    </aside>
+    <main id="main" class="empty">
+      <div id="scroll"><div id="thread"></div></div>
+      <div id="home"><div class="home-col"><div class="hgreet" id="hgreet"></div><div class="stats" id="stats"></div></div></div>
+      <div id="center">
+        <div id="greet"></div>
+        <div id="composerWrap">
+          <div id="ctx"><span class="ctxb"><span data-ic="laptop"></span>Local</span><span class="ctxb"><span data-ic="folder"></span><span id="ctxFolder"></span></span></div>
+          <div id="composer"><canvas class="clawd" id="clawd" aria-hidden="true"></canvas>
+            <div id="cInput"><span id="cText"></span><span id="caret"></span><span id="cPh"></span></div>
+            <button id="sendBtn" tabindex="-1"></button>
+          </div>
+          <div class="c-row">
+            <span class="cb2" data-ic="plus"></span><span class="cb2" data-ic="mic"></span><span class="cb2 sm" data-ic="chev"></span><span class="auto">Auto</span>
+            <div class="sp"></div>
+            <button id="modelBtn" tabindex="-1"><span id="modelName"></span></button>
+            <button id="effortBtn" tabindex="-1"><span id="effortName"></span><span id="effortWarn"></span></button>
+            <span id="busy"></span>
+          </div>
+          <div id="chips"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div></div>
+<div id="menu" hidden></div>
+<div id="effortPop" hidden></div>
+<div id="fakeCursor"><svg width="22" height="26" viewBox="0 0 22 26"><path d="M3 2v19.2l4.9-4.6 3.1 7.1 3.3-1.4-3.1-7h6.6z" fill="#fff" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+<div id="toast"></div>
+<input type="file" id="fileIn" accept=".txt,.md,text/plain" hidden>
+
+<aside id="panel" aria-label="Script panel">
+  <header>
+    <div class="ttl"><svg width="18" height="18" viewBox="0 0 32 32"><g stroke="#D97757" stroke-width="3.4" stroke-linecap="round"><path d="M16 4v24M4 16h24M7.5 7.5l17 17M24.5 7.5l-17 17"/></g></svg>Claude Code Desktop Dummy</div>
+    <button class="x" id="pClose" title="Close (F2)">✕</button>
+  </header>
+  <nav>
+    <button data-tab="guion" class="on">Script</button>
+    <button data-tab="ajustes">Settings</button>
+    <button data-tab="ayuda">Syntax</button>
+  </nav>
+
+  <section data-pane="guion" class="on">
+    <div class="seg" id="modeSeg">
+      <button data-mode="magic">My pace</button>
+      <button data-mode="auto">Automatic</button>
+      <button data-mode="free">Free</button>
+    </div>
+    <p class="hint" id="modeHint"></p>
+    <div class="ins" id="insRow"><span>Insert:</span>
+      <button data-snip="[tokens 3.5M]" title="Tokens Claude's answer burns">tokens</button>
+      <button data-snip="[think 5]" title="Seconds Claude thinks before answering">think</button>
+      <button data-snip="reasoning: " title="Claude's thinking block">reasoning</button>
+      <button data-snip="tool: Web Search(&quot;query&quot;)" title="Tool call">tool</button>
+      <button data-snip="user: /model {opus max}" title="Switch model and effort">model</button>
+      <button data-snip="[pause 2]" title="Pause">pause</button>
+    </div>
+    <textarea id="script" spellcheck="false"></textarea>
+    <div class="status" id="parseStatus"></div>
+    <div class="btns">
+      <button class="btn primary" id="bPlay">▶ Play</button>
+      <button class="btn" id="bRestart">↺ Restart</button>
+      <button class="btn" id="bFull">⛶ Full screen</button>
+    </div>
+    <div class="btns small">
+      <button class="btn" id="bOpen">Open .txt</button>
+      <button class="btn" id="bSave">Save .txt</button>
+      <button class="btn" id="bExample">Load example</button>
+    </div>
+    <div class="state" id="runState"><i></i><span></span></div>
+    <div class="keys"><kbd>F2</kbd> panel · <kbd>F8</kbd> play / pause · <kbd>F9</kbd> restart · <kbd>Ctrl</kbd>+<kbd>O</kbd> expand/collapse thinking · <kbd>Esc</kbd> stop answer · <kbd>F11</kbd> full screen</div>
+    <a class="swap" href="terminal.html">Open the same script in Claude Code (terminal) →</a>
+  </section>
+
+  <section data-pane="ajustes">
+    <h4>Appearance</h4>
+    <div class="f"><label>Theme</label><select data-k="theme">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select></div>
+    <div class="f"><label>Interface language</label><select data-k="lang">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+    </select></div>
+    <div class="f"><label>Window frame</label><select data-k="frame">
+      <option value="none">None (full screen)</option>
+      <option value="win">Windows window</option>
+      <option value="mac">macOS window</option>
+    </select></div>
+    <div class="f"><label>Zoom</label><div class="v"><input type="range" min="0.7" max="1.6" step="0.05" data-k="zoom"><output data-o="zoom"></output></div></div>
+    <label class="chk"><input type="checkbox" data-k="sidebar">Show sidebar</label>
+    <label class="chk"><input type="checkbox" data-k="fakeCursor">Animated cursor when switching model or effort (Automatic and My pace modes)</label>
+    <div class="f"><label>Mouse speed</label><div class="v"><input type="range" min="0.4" max="2" step="0.05" data-k="mouseSpeed"><output data-o="mouseSpeed"></output></div></div>
+    <h4>Timing</h4>
+    <div class="f"><label>Global speed</label><div class="v"><input type="range" min="0.25" max="3" step="0.05" data-k="speed"><output data-o="speed"></output></div></div>
+    <div class="f"><label>Typing (chars/sec)</label><div class="v"><input type="range" min="4" max="40" step="1" data-k="typeCps"><output data-o="typeCps"></output></div></div>
+    <div class="f"><label>How answers appear</label><select data-k="reveal">
+      <option value="stream">Streaming (like Claude)</option>
+      <option value="block">All at once</option>
+    </select></div>
+    <div class="f"><label>Streaming (chars/sec)</label><div class="v"><input type="range" min="40" max="900" step="10" data-k="streamCps"><output data-o="streamCps"></output></div></div>
+    <div class="f"><label>Letters per key</label><div class="v"><input type="range" min="1" max="4" step="1" data-k="charsPerKey"><output data-o="charsPerKey"></output></div></div>
+    <div class="f"><label>Start delay (sec)</label><input type="number" min="0" max="15" step="0.5" data-k="startDelay"></div>
+    <label class="chk"><input type="checkbox" data-k="hideMouse">Hide the mouse pointer when it stops moving</label>
+    <label class="chk"><input type="checkbox" data-k="toasts">Show notices (pause, restart…)</label>
+    <h4>Sidebar: groups and sessions</h4>
+    <p class="hint">One line per group. Below it, its sessions starting with <code style="font:11.5px Cascadia Mono,monospace">- </code> (or <code style="font:11.5px Cascadia Mono,monospace">* </code> for a filled dot). The script's session shows up under “Ungrouped”.</p>
+    <textarea id="recentsTa" data-k="recents" spellcheck="false"></textarea>
+    <h4>Model picker</h4>
+    <p class="hint">One line per model: <code style="font:11.5px Cascadia Mono,monospace">alias | name | badge</code> (the badge is optional, e.g. “Default”). Leave it empty to use the defaults for the chosen language.</p>
+    <textarea id="models" data-k="models" spellcheck="false"></textarea>
+    <div class="btns small">
+      <button class="btn" id="bModelsReset">Reset models</button>
+      <button class="btn" id="bSettingsReset">Reset all settings</button>
+    </div>
+  </section>
+
+  <section data-pane="ayuda">
+    <div class="doc">
+      <h3>Same script as Claude Code</h3>
+      <p>Both simulators use exactly the same format (<code>user:</code>, <code>claude:</code>, <code>[think]</code>, <code>tool:</code>…). If you open both from the same folder in the same browser, they share the script. Spanish keywords (<code>yo:</code>, <code>[pensar]</code>…) work too.</p>
+      <h3>The basics</h3>
+<pre>user: claude what are black holes
+
+claude: A black hole is a **pothole**.
+
+1. It rains
+2. A truck drives by</pre>
+      <p>Each block starts at the beginning of a line. Claude's answer can span many lines and supports Markdown: <code>**bold**</code>, <code>*italic*</code>, <code>`code`</code>, lists, headings, tables and code blocks. Lines starting with <code>//</code> are comments.</p>
+      <h3>How each directive looks in Desktop</h3>
+      <table>
+        <tr><td><code>user: /model {opus max}</code></td><td>The cursor opens the model picker and selects Opus, then opens “Effort” and drags the bar to Max. Nothing is typed in the chat.</td></tr>
+        <tr><td>effort</td><td><code>low</code> · <code>medium</code> · <code>high</code> · <code>xhigh</code> · <code>max</code> · <code>ultracode</code> (the bar fills with animated purple pixels).</td></tr>
+        <tr><td><code>user: /effort ultracode</code></td><td>Changes only the effort.</td></tr>
+        <tr><td><code>{opus fast}</code></td><td>Also turns on “Enable fast mode” in the menu.</td></tr>
+        <tr><td><code>[think 8 Phrase]</code></td><td>“Phrase” shows up as a live thinking block while Claude thinks for 8 seconds.</td></tr>
+        <tr><td><code>reasoning:</code></td><td>Collapsible thinking block. Optional title: <code>reasoning: [Concluded it is a pothole] text…</code></td></tr>
+        <tr><td><code>tool:</code></td><td>Tool row (web search, command…). The first output line shows next to it; <kbd>Ctrl</kbd>+<kbd>O</kbd> expands it.</td></tr>
+        <tr><td><code>tool-error:</code></td><td>A tool that fails.</td></tr>
+        <tr><td><code>edit: file</code></td><td>A file edit with a diff (<code>@@ N</code>, <code>-</code> removed, <code>+</code> added).</td></tr>
+        <tr><td><code>todos:</code></td><td>Checklist: <code>[x]</code> done · <code>[&gt;]</code> in progress · <code>[ ]</code> pending.</td></tr>
+        <tr><td><code>permission:</code></td><td>“Allow Claude to use Bash?” card. <code>[choose 1]</code> = Allow once, <code>2</code> = Always allow, <code>3</code> = Deny.</td></tr>
+        <tr><td><code>[tokens 3.5M]</code></td><td>The counter next to the spinner climbs to that number and ends with “Worked for 9s · 3.5M tokens”. Accepts <code>800k</code>, <code>1200000</code>…</td></tr>
+        <tr><td><code>[error]</code></td><td>Red notice. Without text it shows the classic “capacity constraints” message.</td></tr>
+        <tr><td><code>[info text]</code></td><td>A small gray system line.</td></tr>
+        <tr><td><code>[interrupt]</code></td><td>Claude's answer gets interrupted.</td></tr>
+        <tr><td><code>[pause 2]</code></td><td>Waits 2 seconds.</td></tr>
+        <tr><td><code>/compact</code> · <code>[compact]</code></td><td>“Compacting our conversation…” animation.</td></tr>
+        <tr><td><code>/clear</code> · <code>[clear]</code></td><td>The cursor clicks “New”.</td></tr>
+        <tr><td><code>[title Text]</code> · <code>@title</code></td><td>Session title (shown after the first answer and in the sidebar).</td></tr>
+        <tr><td><code>@greeting</code></td><td>Home screen greeting (default “What’s up next, &lt;user&gt;?”).</td></tr>
+        <tr><td><code>@sessions</code> … <code>@moby</code></td><td>Numbers on the home screen stats card: <code>@sessions</code>, <code>@messages</code>, <code>@totaltokens</code>, <code>@activedays</code>, <code>@peakhour</code>, <code>@favoritemodel</code>, <code>@moby</code>.</td></tr>
+      </table>
+      <p><code>[mode]</code> and <code>[context]</code> only exist in the terminal version; they are ignored here.</p>
+      <h3>Modes</h3>
+      <table>
+        <tr><td>My pace</td><td>Every key you press types the next letter of your scripted line (9 keys = 9 letters). <kbd>Enter</kbd> sends it and Claude answers. In the model picker and permission cards, each key is one cursor click; <kbd>Enter</kbd> completes everything.</td></tr>
+        <tr><td>Automatic</td><td>Everything plays by itself. <kbd>Space</kbd> or <kbd>F8</kbd> to start and pause.</td></tr>
+        <tr><td>Free</td><td>You type for real; Claude answers with its next scripted turn. You can use the real mouse on the model picker and permission cards.</td></tr>
+      </table>
+      <p>In any mode you can really click the model picker, the thinking blocks and the permission buttons.</p>
+    </div>
+  </section>
+</aside>
+
+<script type="text/plain" id="example-script">
+// ════════════════════════════════════
+//  CLAUDE SIMULATOR · EXAMPLE SCRIPT · "Black holes"
+//  This script works in both apps (Claude Code and Claude Desktop).
+//  Lines starting with // are comments: they never show on screen.
+//  F2 panel · F8 play/pause · F9 restart · Ctrl+O expand thinking
+// ════════════════════════════════════
+
+// ── 1. SETUP ── lines starting with @ (all optional)
+@user: ModernWestern
+@plan: Claude Max
+@cwd: ~/projects/space-facts
+@title: Black hole explanation
+// Starting model and effort: low · medium · high · xhigh · max · ultracode
+@model: haiku
+@effort: low
+// Claude Desktop home screen (greeting + usage stats card)
+@greeting: What's up next, ModernWestern?
+@sessions: 128
+@messages: 4,096
+@totaltokens: 42M
+@activedays: 15
+@peakhour: 3 AM
+@favoritemodel: Opus 5.5
+@moby: 1337
+
+// ── 2. THE CONVERSATION ── "user:" is you, "claude:" is Claude.
+// Claude's answers can span many lines and use Markdown.
+user: claude what are black holes
+
+claude: A black hole is most likely one of those **potholes** in the street. They usually form for three reasons:
+
+1. It rains a lot
+2. An 18-wheeler drives by
+3. City hall *promises* to fix it
+
+Want me to help you draft a formal complaint to your city council?
+
+// ── 3. SWITCH MODEL ── text inside { } is never typed:
+// it tells the model picker what to choose (model + effort).
+user: /model {sonnet medium}
+
+user: no, I mean in physics
+
+// [think N] = seconds Claude spends thinking before answering
+[think 4]
+claude: Got it. In physics, a black hole is something that is **in space**.
+
+More precisely, it's *up there*. Sometimes a little to the left, depending on where you're standing.
+
+// ── 4. MAXIMUM POWER ── try {opus ultracode} for the purple pixel bar
+user: /model {opus max}
+
+// "ultrathink" shows up in rainbow colors in Claude Code
+user: ultrathink explain what a black hole REALLY is in physics
+
+// [think N Phrase] = custom phrase shown while it thinks
+[think 9 Consulting Stephen Hawking]
+// [tokens X] = tokens this answer "burns" (800k, 3.5M, 1200000…)
+[tokens 4.2M]
+// reasoning: [optional title] text → collapsible thinking block (Ctrl+O)
+reasoning: [Concluded it is a pothole, just far away] The user insists on "physics". Physics studies things that exist. Potholes exist. Conclusion: a black hole is a pothole, just far away. I must sound very confident.
+
+// tool: Name(arguments) — the lines below are the tool output
+tool: Web Search("biggest pothole in the universe")
+Did 1 search in 3s
+
+[think 3]
+claude: After an exhaustive analysis, I can confirm with total certainty:
+
+| Concept | Scientific explanation |
+|---|---|
+| Black hole | Space pothole |
+| Event horizon | Where the GPS says "recalculating" |
+| Singularity | The hole they never fix |
+
+In short: it's a pothole, but in `dark mode`.
+
+user: claude please
+
+[think 3]
+// permission: Tool(args) | description — then [choose 1|2|3]
+// 1 = Yes / Allow once · 2 = Always allow · 3 = No (interrupts Claude)
+permission: Bash(rm -rf ~/physics) | Deletes the physics folder to avoid further confusion
+(No content)
+[choose 1]
+
+claude: Done. Physics no longer exists, so technically black holes don't either. Problem solved ✓
+
+// ── 5. BONUS ROUND ── everything else the simulator can do
+// [pause N] = wait N seconds (nothing happens on screen)
+[pause 2]
+// [title …] = renames the session · [context N%] and [mode plan|edits|bypass|normal]
+// only change the Claude Code footer
+[title Physics rescue attempt]
+[context 4%]
+
+user: ok... at least fix my astronomy homework
+
+[think 3 Grading with confidence]
+// todos: a checklist — [x] done · [>] in progress · [ ] pending
+todos:
+[x] Delete physics
+[>] Fix astronomy homework
+[ ] Apologize to Neil deGrasse Tyson
+
+// tool-error: a tool that fails
+tool-error: Read(homework/astronomy.md)
+File does not exist.
+
+tool: Bash(ls homework)
+astronomy-final-FINAL-v2.md
+
+// edit: file — then a diff: "@@ N" start line, "-" removed, "+" added
+edit: homework/astronomy-final-FINAL-v2.md
+@@ 1
+- The Sun is a star.
++ The Sun is a very optimistic lamp.
+- The Moon orbits the Earth.
++ The Moon is the Sun's night shift.
+
+claude: Homework fixed. I also renamed the Moon to **"Night Sun"** for consistency.
+
+user: please stop
+// [interrupt] = Claude gets interrupted mid-answer
+[think 2]
+[interrupt]
+
+// /compact animates "compacting the conversation" · /clear starts over
+user: /compact
+
+user: claude, what is chemistry?
+// [info text] = a small gray system line
+[info Claude is reconsidering its life choices]
+// [error] = the classic "overloaded" error (or [error your own text])
+[think 2]
+[error]
+</script>
+
+<script>
+(() => {
+'use strict';
+
+/* ════════════════════ Utilities ════════════════════ */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+const num = s => { const m = String(s ?? '').replace(',', '.').match(/-?\d+(\.\d+)?/); return m ? parseFloat(m[0]) : null; };
+const h = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+
+/* ════════════════════ Icons ════════════════════ */
+const P = {
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  chev: '<path d="m6 9 6 6 6-6"/>',
+  chevR: '<path d="m9 18 6-6-6-6"/>',
+  up: '<path d="m5 12 7-7 7 7M12 19V5"/>',
+  stop: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/>',
+  copy: '<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  thumbUp: '<path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/>',
+  thumbDown: '<path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/>',
+  retry: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  sliders: '<path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/>',
+  clock: '<circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/>',
+  chats: '<path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>',
+  folder: '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  shapes: '<path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/>',
+  code: '<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>',
+  globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/>',
+  terminal: '<path d="m4 17 6-6-6-6M12 19h8"/>',
+  file: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/>',
+  pencil: '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>',
+  wrench: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  panel: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/>',
+  menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  updown: '<path d="m7 15 5 5 5-5M7 9l5-5 5 5"/>',
+  pen: '<path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/>',
+  cap: '<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
+  coffee: '<path d="M10 2v2M14 2v2M6 2v2M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/>',
+  bulb: '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5M9 18h6M10 22h4"/>',
+  min: '<path d="M5 12h14"/>', max: '<rect x="5" y="5" width="14" height="14" rx="1.5"/>', x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  warn: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/>',
+  help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/>',
+  back: '<path d="M19 12H5M12 19l-7-7 7-7"/>', fwd: '<path d="M5 12h14M12 5l7 7-7 7"/>',
+  chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  laptop: '<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/>',
+  diff: '<path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2zM9 13h6M12 10v6"/>',
+  dots: '<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  briefcase: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/>',
+  enter: '<path d="M20 5v7a3 3 0 0 1-3 3H5M9 11l-4 4 4 4"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3"/>',
+  bug: '<path d="M12 20v-9M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4zM14.12 3.88 16 2M8 2l1.88 1.88M9 7.13v-1a3 3 0 0 1 6 0v1M6 13H2M22 13h-4M3 21c0-2.1 1.7-3.9 3.8-4M20.97 5c0 2.1-1.6 3.8-3.5 4M3 5c0 2.1 1.6 3.8 3.5 4M21 21c0-2.1-1.7-3.9-3.8-4"/>',
+};
+const VERBS = ['Thinking', 'Pondering', 'Cogitating', 'Clauding', 'Musing', 'Brewing', 'Percolating', 'Ruminating', 'Noodling', 'Mulling', 'Synthesizing', 'Reticulating'];
+const pickVerb = () => VERBS[Math.floor(Math.random() * VERBS.length)];
+const fmtDur = s => s < 60 ? `${s}s` : `${Math.floor(s / 60)}m ${s % 60}s`;
+const fmtTok = n => { n = Math.round(n); return n >= 1e6 ? `${(n / 1e6).toFixed(n >= 1e7 ? 0 : 1)}M` : n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n); };
+// "Question" icon from Phosphor Icons (regular, MIT license), as shipped in @phosphor-icons/core 2.1.1.
+const HELP_ICON = '<svg class="help" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M140,180a12,12,0,1,1-12-12A12,12,0,0,1,140,180ZM128,72c-22.06,0-40,16.15-40,36v4a8,8,0,0,0,16,0v-4c0-11,10.77-20,24-20s24,9,24,20-10.77,20-24,20a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-.72c18.24-3.35,32-17.9,32-35.28C168,88.15,150.06,72,128,72Zm104,56A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z"/></svg>';
+const ic = (name, cls = '') => `<svg class="i ${cls}" viewBox="0 0 24 24">${P[name] || ''}</svg>`;
+const SPARK_RAYS = [[0,10.6],[29,8.2],[61,10.2],[92,7.6],[121,10.4],[150,8.4],[182,9.8],[211,7.8],[240,10.6],[270,8],[301,10],[331,8.6]];
+const spark = (live = false) => `<svg class="spark${live ? ' live' : ''}" viewBox="0 0 24 24">${SPARK_RAYS.map(([a, r], i) => {
+  const rad = a * Math.PI / 180, c = Math.cos(rad), s = Math.sin(rad);
+  return `<line x1="${(12 + c * 1.3).toFixed(2)}" y1="${(12 + s * 1.3).toFixed(2)}" x2="${(12 + c * r).toFixed(2)}" y2="${(12 + s * r).toFixed(2)}" style="animation-delay:${(-i * 0.11).toFixed(2)}s"/>`;
+}).join('')}</svg>`;
+
+/* ════════════════════ Interface texts ════════════════════ */
+const L10N = {
+  en: {
+    newChat: 'New chat', chats: 'Chats', projects: 'Projects', artifacts: 'Artifacts', code: 'Code', recents: 'Recents', share: 'Share',
+    phNew: 'Describe a task or ask a question', phReply: 'Reply to Claude...', home: n => `What’s up next, ${n}?`,
+    stTabs: ['Overview', 'Models'], stRanges: ['All', '30d', '7d'],
+    stLabels: ['Sessions', 'Messages', 'Total tokens', 'Active days', 'Peak hour', 'Favorite model'],
+    moby: n => `You've used ~${n}× more tokens than Moby-Dick.`, disclaimer: 'Claude can make mistakes. Please double-check responses.',
+    thinking: 'Thinking', thought: 'Thought process', ext: 'Extended thinking', extDesc: 'Think longer for complex tasks', more: 'More models',
+    allowQ: n => `Allow Claude to use ${n}?`, deny: 'Deny', once: 'Allow once', always: 'Always allow', denied: 'Denied',
+    interrupted: 'Claude’s response was interrupted.',
+    capacity: 'Due to unexpected capacity constraints, Claude is unable to respond to your message. Please try again soon.',
+    greet: hr => hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening',
+    chips: [['pen', 'Write'], ['cap', 'Learn'], ['code', 'Code'], ['coffee', 'Life stuff'], ['bulb', "Claude's choice"]],
+    compacting: 'Compacting our conversation so we can keep chatting…', compacted: 'Conversation compacted',
+    web: 'Searched the web', edited: 'Edited', todos: 'To-dos', running: 'Running…', read: 'Read', fetched: 'Fetched',
+    plans: { max: 'Max', pro: 'Pro', team: 'Team', free: 'Free' },
+    effort: 'Effort', faster: 'Faster', smarter: 'Smarter', recommended: 'Recommended',
+    efforts: { low: 'Low', medium: 'Medium', high: 'High', xhigh: 'Extra high', max: 'Max', ultracode: 'Ultracode' },
+    maxWarn: 'Claude thinks longer with Max effort and can consume 3.5× or more usage than Medium.',
+    fastMode: 'Fast mode', enableFast: 'Enable fast mode',
+    search: 'Search', newSession: 'New', customize: 'Customize', moreNav: 'More', noFolder: 'No folder',
+    searched: 'Searched the web for', ran: 'Ran', thoughtFor: s => `Thought for ${s}s`,
+    worked: (d, t) => `Worked for ${d} · ${t} tokens`,
+  },
+  es: {
+    newChat: 'Nuevo chat', chats: 'Chats', projects: 'Proyectos', artifacts: 'Artefactos', code: 'Código', recents: 'Recientes', share: 'Compartir',
+    phNew: 'Describe una tarea o haz una pregunta', phReply: 'Responder a Claude...', home: n => `¿Qué sigue, ${n}?`,
+    stTabs: ['Resumen', 'Modelos'], stRanges: ['Todo', '30d', '7d'],
+    stLabels: ['Sesiones', 'Mensajes', 'Tokens totales', 'Días activos', 'Hora pico', 'Modelo favorito'],
+    moby: n => `Has usado ~${n}× más tokens que Moby-Dick.`, disclaimer: 'Claude puede cometer errores. Verifica las respuestas.',
+    thinking: 'Pensando', thought: 'Proceso de pensamiento', ext: 'Pensamiento extendido', extDesc: 'Piensa más en tareas complejas', more: 'Más modelos',
+    allowQ: n => `¿Permitir que Claude use ${n}?`, deny: 'Denegar', once: 'Permitir una vez', always: 'Permitir siempre', denied: 'Denegado',
+    interrupted: 'Se interrumpió la respuesta de Claude.',
+    capacity: 'Debido a limitaciones de capacidad inesperadas, Claude no puede responder a tu mensaje. Inténtalo de nuevo en breve.',
+    greet: hr => hr < 12 ? 'Buenos días' : hr < 20 ? 'Buenas tardes' : 'Buenas noches',
+    chips: [['pen', 'Escribir'], ['cap', 'Aprender'], ['code', 'Código'], ['coffee', 'Vida diaria'], ['bulb', 'Elección de Claude']],
+    compacting: 'Compactando nuestra conversación para que podamos seguir hablando…', compacted: 'Conversación compactada',
+    web: 'Buscó en la web', edited: 'Editó', todos: 'Tareas', running: 'Ejecutando…', read: 'Leyó', fetched: 'Consultó',
+    plans: { max: 'Max', pro: 'Pro', team: 'Team', free: 'Gratis' },
+    effort: 'Esfuerzo', faster: 'Más rápido', smarter: 'Más inteligente', recommended: 'Recomendado',
+    efforts: { low: 'Bajo', medium: 'Medio', high: 'Alto', xhigh: 'Muy alto', max: 'Máximo', ultracode: 'Ultracode' },
+    maxWarn: 'Claude piensa más con el esfuerzo Máximo y puede consumir 3.5× o más uso que Medio.',
+    fastMode: 'Modo rápido', enableFast: 'Activar modo rápido',
+    search: 'Buscar', newSession: 'Nuevo', customize: 'Personalizar', moreNav: 'Más', noFolder: 'Sin carpeta',
+    searched: 'Buscó en la web', ran: 'Ejecutó', thoughtFor: s => `Pensó durante ${s}s`,
+    worked: (d, t) => `Trabajó ${d} · ${t} tokens`,
+  },
+};
+const T = () => L10N[S.lang] || L10N.en;
+
+/* ════════════════════ Settings ════════════════════ */
+// Format: alias | name | badge (optional, e.g. "Default")
+const DEFAULT_MODELS = {
+  en: ['opus | Opus 5.5', 'fable | Fable 5.1', 'sonnet | Sonnet 5.5', 'haiku | Haiku 5.5 | Default'].join('\n'),
+  es: ['opus | Opus 5.5', 'fable | Fable 5.1', 'sonnet | Sonnet 5.5', 'haiku | Haiku 5.5 | Predeterminado'].join('\n'),
+};
+// Groups: one line per group; its sessions below with "- " ("* " = filled dot). A group without sessions is shown collapsed.
+const DEFAULT_RECENTS = [
+  'Website', 'Mobile app', 'Docs',
+  'Backend', '* Fix login redirect loop', '- Add rate limiting to API', '- Migrate database to Postgres 17', '- Write integration tests',
+  '- Refactor payment service', '- Investigate slow queries',
+  'Design system',
+  'Experiments', '* Prototype voice commands', '- Benchmark image pipeline', '- Try new chart library',
+  'Research', 'Archive',
+  'Ungrouped',
+].join('\n');
+// Clawd frames (34×23 half-units) taken from the reference GIF.
+// O orange · S orange shade · K eyes · G laptop · D dark shade · . transparent
+const CLAWD_DURS = [390,70,90,90,170,70,170,90,90,70,90,90,90,90,90,70,90,90,90,90,70,90,90,90,90,70,90,90,80,90,70,90,180,90,70,120];
+const CLAWD_FRAMES = [
+"................................../................................../................................../................................../................................../................................../................................../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOKKOOOOOOOOKKOO............../....OOKKOOOOOOOOKKOO............../OOOOOOOOOOOOOOOOOOOOOOOO........../OOOOOOOOOOOOOOOOOOOOOOOO........../OOOOOOOOOOOOOOOOOOOOOOOO........../OOOOOOOOOOOOOOOOOOOOOOOO........../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO..............",
+"................................../................................../................................../................................../................................../................................../................................../................................../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOKKOO............../OOOOOOKKKOOOOOOOKKOO............../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOO............/....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO..............",
+"................................../................................../................................../................................../................................../................................../................................../................................../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOKKOO............../OOOOOOKKKOOOOOOOKKOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOO............/....OOOOOOOOOOOOOOOO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO..............",
+"................................../................................../................................../................................../................................../................................../................................../................................../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOKKOO............../OOOOOOKKKOOOOOOOKKOO............../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOO............/....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO..............",
+"................................../................................../................................../................................../................................../................................../................................../................................../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOKKOO............../OOOOOOKKKOOOOOOOKKOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOO............/....OOOOOOOOOOOOOOOO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO..............",
+"................................../................................../................................../................................../.....................GG.........../.....................GGGG........./.......................GGGGG....../....OOOOOOOOOOOOOOOO.....GGG....../....OOOOOOOOOOOOOOOO.GGGGGGG....../....OOKKOOOOOOOOKKOOOOOO........../....OOKKOOOOOOOOKKOOOOOO........../....OOOOOOOOOOOOOOOOOOOO........../OOOOOOOOOOOOOOOOOOOOOOOO........../OOOOOOOOOOOOOOOOOOOOOOO.........../OOOOOOOOOOOOOOOOOOOOOO............/OOOOOOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO..............",
+"..........................G......./..........................G......./..........................G......./..........................G......./..........................G......./.....................GGGGGG......./....................OOOO........../....OOOOOOOOOOOOOOOOOOOO........../....OOOOOOOOOOOOOOOOOOOO........../....OOKKOOOOOOOOKKOOOOOO........../....OOKKOOOOOOOOKKOO............../....OOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO..............",
+"................................../................................../................................../................................../................................../................................../................................../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOKKOOOOOOOOKKOO..........GG../OOOOOOKKOOOOOOOOKKOO.........GGGG./OOOOOOOOOOOOOOOOOOOOOO......GGGGG./OOOOOOOOOOOOOOOOOOOOOOO.....GGGG../OOOOOOOOOOOOOOOOOOOOOOGGGGGGGGG.../....OOOOOOOOOOOOOOOOOOGGGGGGG...../....OOOOOOOOOOOOOOOOOOOO........../....OOOOOOOOOOOOOOOOOOOO........../....OOOOOOOOOOOOOOOOOOOO........../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO..............",
+"................................../................................../................................../................................../................................../................................../................................../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOKKOOOOOOOOKKOO............../....OOKKOOOOOOOOKKOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOOOOOO........../....OOOOOOOOOOOOOOOOOOOO........G./....OOOOOOOOOOOOOOOOOOOO.......GG./....OO..OO....OO..OOOOOO......GG../....OO..OO....OO..OO.........GG.../....OO..OO....OO..OO........GG..../....OO..OO....OO..OO...GGGGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../OOOOOOKKOOOOOOOOKKOO............../OOOOOOKKOOOOOOOOKKOOOOOO........../OOOOOOOOOOOOOOOOOOOOOOOO........../OOOOOOOOOOOOOOOOOOOOOOOO........../....OOOOOOOOOOOOOOOOOOOO........../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OO..OO....OO..OO............GG/....OO..OO....OO..OO..........GG../....OO..OO....OO..OO........GG..../....OO..OO....OO..OO...GGGGGG.....",
+"................................../................................../................................../........OOOO......OOOO............/........OOOO......OOOO............/.......OOOOO......OOOOO.........../.....SSOOOOOOOOOOOOOOOO.........../.....SSOOOOOOOOOOOOOOOO.........../.....SSOOOOOOOOOOOOOOOO.........../.....SSOOOOOOOOOOOOOO............./.....SSOKKOOOOOOOOKKO............./.....SSOKKOOOOOOOOKKO............./.....SSOOOOOOOOOOOOOO............./.....SSOOOOOOOOOOOOOO............./.....SSOOOOOOOOOOOOOO............./.....SSOOOOOOOOOOOOOO............./.....SSOOOOOOOOOOOOOO...........G./.....SSOOOOOOOOOOOOOO..........GG./.....SSOOOOOOOOOOOOOO.........GG../.....SO..OO....OO..OO........GG.../.....SO..OO....OO..OO.......GG..../.....SO..OO....OO..OO..GGGGGG...../.....SO..OO....OO..OO.............",
+"................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOOS.........../......SSSSOOOOOOOOOOOOSOO........./......SSSSOOKKOOOOOOKKSOOO......../......SSSSOOKKOOOOOOKKSOOO......../......SSSSOOKKOOOOOOKKSSOO......../......SSSSOOOOOOOOOOOOSSSO......../......SSSSOOOOOOOOOOOOSSSS......../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOOOOOO......G./......SSSSOOOOOOOOOOOOOOOO.....GG./......SS..OO....OO..OOOOOO....GG../......SS..OO....OO..OOOOOO...GG.../.....SSS.OOO...OOO.OOOOOOO..GG..../.....SS..OO....OO..OO..GGGGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOOS......G./......SSSSOOOOOOOOOOOOOOOS.....GG./......SSSSOOOOOOOOOOOOOOOS....GG../......SSSSOOOOOOOOOOOOSSSS...GG.../......SS..OO....OO..OO......GG..../.....SSS.OOO...OOO.OOO.GGGGGG...../.....SS..OO....OO..OO.............",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO.......G./......SSSSOOOOOOOOOOOO.........GG./......SSSSOOOOOOOOOOOOSSSS....GG../......SS..OO....OO..OOSSSS...GG.../.....SSS.OOO...OOO.OOOSSSS..GG..../.....SS..OO....OO..OO..GGGGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOOSSSS......../......SSSSOOOOOOOOOOOOSSSS......../......SSSSOOOOOOOOOOOOOOOS......../......SSSSOOOOOOOOOOOOOOOS......G./......SSSSOOOOOOOOOOOOOOOS.....GG./......SSSSOOOOOOOOOOOOOOO.....GG../......SS..OO....OO..OOOOO....GG.../.....SSS.OOO...OOO.OOO......GG..../.....SS..OO....OO..OO..GGGGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOOS......G./......SSSSOOOOOOOOOOOOOOOS.....GG./......SSSSOOOOOOOOOOOOOOOS....GG../......SSSSOOOOOOOOOOOOSSSS...GG.../......SS..OO....OO..OO......GG..../.....SSS.OOO...OOO.OOO.GGGGGG...../.....SS..OO....OO..OO.............",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO.......G./......SSSSOOOOOOOOOOOO.........GG./......SSSSOOOOOOOOOOOOSSSS....GG../......SS..OO....OO..OOSSSS...GG.../.....SSS.OOO...OOO.OOOSSSS..GG..../.....SS..OO....OO..OO..GGGGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOOSSSS......../......SSSSOOOOOOOOOOOOSSSS......../......SSSSOOOOOOOOOOOOOOOS......../......SSSSOOOOOOOOOOOOOOOS......G./......SSSSOOOOOOOOOOOOOOOS.....GG./......SSSSOOOOOOOOOOOOOOO.....GG../......SS..OO....OO..OOOOO....GG.../.....SSS.OOO...OOO.OOO......GG..../.....SS..OO....OO..OO..GGGGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOOS......G./......SSSSOOOOOOOOOOOOOOOS.....GG./......SSSSOOOOOOOOOOOOOOOS....GG../......SSSSOOOOOOOOOOOOSSSS...GG.../......SS..OO....OO..OO......GG..../.....SSS.OOO...OOO.OOO.GGGGGG...../.....SS..OO....OO..OO.............",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO.......G./......SSSSOOOOOOOOOOOO.........GG./......SSSSOOOOOOOOOOOOSSSS....GG../......SS..OO....OO..OOSSSS...GG.../.....SSS.OOO...OOO.OOOSSSS..GG..../.....SS..OO....OO..OO..GGGGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOOSSSS......../......SSSSOOOOOOOOOOOOSSSS......../......SSSSOOOOOOOOOOOOOOOS......../......SSSSOOOOOOOOOOOOOOOS......G./......SSSSOOOOOOOOOOOOOOOS.....GG./......SSSSOOOOOOOOOOOOOOO.....GG../......SS..OO....OO..OOOOO....GG.../.....SSS.OOO...OOO.OOO......GG..../.....SS..OO....OO..OO..GGGGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOOS......G./......SSSSOOOOOOOOOOOOOOOS.....GG./......SSSSOOOOOOOOOOOOOOOS....GG../......SSSSOOOOOOOOOOOOSSSS...GG.../......SS..OO....OO..OO......GG..../.....SSS.OOO...OOO.OOO.GGGGGG...../.....SS..OO....OO..OO.............",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO.......G./......SSSSOOOOOOOOOOOO.........GG./......SSSSOOOOOOOOOOOOSSSS....GG../......SS..OO....OO..OOSSSS...GG.../.....SSS.OOO...OOO.OOOSSSS..GG..../.....SS..OO....OO..OO..GGGGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOOSSSS......../......SSSSOOOOOOOOOOOOSSSS......../......SSSSOOOOOOOOOOOOOOOS......../......SSSSOOOOOOOOOOOOOOOS......G./......SSSSOOOOOOOOOOOOOOOS.....GG./......SSSSOOOOOOOOOOOOOOO.....GG../......SS..OO....OO..OOOOO....GG.../.....SSS.OOO...OOO.OOO......GG..../.....SS..OO....OO..OO..GGGGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOOS......G./......SSSSOOOOOOOOOOOOOOOS.....GG./......SSSSOOOOOOOOOOOOOOOS....GG../......SSSSOOOOOOOOOOOOSSSS...GG.../......SS..OO....OO..OO......GG..../.....SSS.OOO...OOO.OOO.GGGGGG...../.....SS..OO....OO..OO.............",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO.......G./......SSSSOOOOOOOOOOOO.........GG./......SSSSOOOOOOOOOOOOSSSS....GG../......SS..OO....OO..OOSSSS...GG.../.....SSS.OOO...OOO.OOOSSSS..GG..../.....SS..OO....OO..OO..GGGGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOOSSSS......../......SSSSOOOOOOOOOOOOSSSS......../......SSSSOOOOOOOOOOOOOOOS......../......SSSSOOOOOOOOOOOOOOOS......G./......SSSSOOOOOOOOOOOOOOOS.....GG./......SSSSOOOOOOOOOOOOOOO.....GG../......SS..OO....OO..OOOOO....GG.../.....SSS.OOO...OOO.OOO......GG..../.....SS..OO....OO..OO..GGGGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOOS......G./......SSSSOOOOOOOOOOOOOOOS.....GG./......SSSSOOOOOOOOOOOOOOOS....GG../......SSSSOOOOOOOOOOOOSSSS...GG.../......SS..OO....OO..OO......GG..../.....SSS.OOO...OOO.OOO.GGGGGG...../.....SS..OO....OO..OO.............",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO........./......SSSSOOOOOOOOOOOOOOO.......G./......SSSSOOOOOOOOOOOO.........GG./......SSSSOOOOOOOOOOOOSSSS....GG../......SS..OO....OO..OOSSSS...GG.../.....SSS.OOO...OOO.OOOSSSS..GG..../.....SS..OO....OO..OO.OOOOGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../................................../................................../......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOOOOOOOOOOO............/......SSSSOOKKOOOOOOKK............/......SSSSOOKKOOOOOOKK............/......SSSSOOOOOOOOOOOOSSSS......../......SSSSOOOOOOOOOOOOSSSS......../......SSSSOOOOOOOOOOOOOOOS......../......SSSSOOOOOOOOOOOOOOOS......G./......SSSSOOOOOOOOOOOOOOOS.....GG./......SSSSOOOOOOOOOOOOOOOO....GG../......SS..OO....OO..OOOOOO...GG.../.....SSS.OOO...OOO.OOOOOOO..GG..../.....SS..OO....OO..OO.OOOOGGG.....",
+"................................../................................../................................../................................../................................../................................../................................../................................../.....SSSSOOOOOOOOOOOO............./.....SSSSOOOOOOOOOOOOS............/.....SSSSOOOOOOOOOOOOSOO........../.....SSSSOOKKOOOOOOKKSOOO........./.....SSSSOOKKOOOOOOKKSOOO........./.....SSSSOOKKOOOOOOKKSSOO......G../.....SSSSOOOOOOOOOOOOSSSO.....GG../.....SSSSOOOOOOOOOOOOSSSS....GG.../.....SSSSOOOOOOOOOOOOOO.....GG..../.....SSSSOOOOOOOOOOOOOOOO..GG...../.....SSSSOOOOOOOOOOOOOOOOGGG....../......SS..OO....OO.OOOOOOO......../......SS..OO....OO..OOOOOO......../.....SSS.OOO...OOO.OOOOOOO......../.....SS..OO....OO..OO.............",
+"................................../................................../................................../................................../................................../................................../................................../....SSOOOOOOOOOOOOOO............../....SSOOOOOOOOOOOOOO............../....SSOOOOOOOOOOOOOO............../....SSOOKKOOOOOOOOKK............../....SSSSKKOOOOOOOOKK............../..OOOOOSOOOOOOOOOOOOOOGG........../..OOOOOSOOOOOOOOOOOOOOOGG........./..OOOOOSOOOOOOOOOOOOOOOOGGG......./..OOOOOSOOOOOOOOOOOOOOOOOOGG....../....SSSSOOOOOOOOOOOOOOOOOOGG....../....SSOOOOOOOOOOOOOOOGGGGGGG....../....SSOOOOOOOOOOOOOO............../....SS..OO....OO..OO............../....SS..OO....OO..OO............../....SS..OO....OO..OO............../....SS..OO....OO..OO..............",
+"................................../................................../................................../................................../................................../................................../................................../................................../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOKKOOOOOOOOKKOO............../OOOOOOKKOOOOOOOOKKOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOOO.........../....OOOOOOOOOOOOOOOOOO............/....OOOOOOOOOOOOOOOO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO..............",
+"................................../................................../................................../................................../................................../................................../................................../................................../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOO............../OOOOOOKKOOOOOOOOKKOO............../OOOOOOKKOOOOOOOOKKOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOOOO............/....OOOOOOOOOOOOOOOOOO............/....OOOOOOOOOOOOOOOOOO............/....OOOOOOOOOOOOOOOOOO............/....OOOOOOOOOOOOOOOO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO..............",
+"................................../................................../................................../................................../................................../................................../................................../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOKKOOOOOOOOKKOO............../....OOKKOOOOOOOOKKOO............../....OOOOOOOOOOOOOOOO............../OOOOOOOOOOOOOOOOOOOOOOOO........../OOOOOOOOOOOOOOOOOOOOOOOO........../OOOOOOOOOOOOOOOOOOOOOOOO........../OOOOOOOOOOOOOOOOOOOOOOOO........../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO..............",
+"................................../................................../................................../................................../................................../................................../................................../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOKKOOOOOOOOKKOO............../....OOKKOOOOOOOOKKOO............../OOOOOOOOOOOOOOOOOOOOOOOO........../OOOOOOOOOOOOOOOOOOOOOOOO........../OOOOOOOOOOOOOOOOOOOOOOOO........../OOOOOOOOOOOOOOOOOOOOOOOO........../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OOOOOOOOOOOOOOOO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO............../....OO..OO....OO..OO..............",
+];
+const CLAWD_PAL = { O: '#D87050', S: '#B86848', G: '#888888', K: '#000000', D: '#804030' };
+function drawClawd(i) {
+  const c = $('#clawd');
+  if (!c) return;
+  const P = 4;
+  if (c.width !== 34 * P) { c.width = 34 * P; c.height = 23 * P; }
+  const x = c.getContext('2d');
+  x.clearRect(0, 0, c.width, c.height);
+  CLAWD_FRAMES[i].split('/').forEach((row, r) => {
+    for (let k = 0; k < row.length; k++) {
+      const ch = row[k];
+      if (ch === '.') continue;
+      x.fillStyle = CLAWD_PAL[ch];
+      x.fillRect((row.length - 1 - k) * P, r * P, P, P); // horizontal mirror: faces the right way
+    }
+  });
+}
+// Idle and, every 8-16 s, the full sequence: blink → takes out the laptop → types → puts it away.
+let clawdT;
+function clawdIdle() {
+  drawClawd(0);
+  clearTimeout(clawdT);
+  clawdT = setTimeout(() => clawdPlay(1), 8000 + Math.random() * 8000);
+}
+function clawdPlay(i) {
+  if (i >= CLAWD_FRAMES.length) { clawdIdle(); return; }
+  drawClawd(i);
+  clawdT = setTimeout(() => clawdPlay(i + 1), CLAWD_DURS[i]);
+}
+function parseGroups(txt) {
+  const groups = [];
+  for (const raw of String(txt || '').split('\n')) {
+    const l = raw.trim();
+    if (!l) continue;
+    const m = raw.match(/^\s*([-*])\s+(.*)$/);
+    if (m && groups.length) groups[groups.length - 1].items.push({ t: m[2].trim(), f: m[1] === '*' });
+    else groups.push({ name: l, items: [] });
+  }
+  return groups;
+}
+function fmtStatsHeat(days, seed) {
+  // 26 weeks × 7 days; the last "days" days have activity (like the real app).
+  const cols = 26, total = cols * 7, todayIdx = total - 6;
+  let x = seed || 7; const rnd = () => (x = (x * 9301 + 49297) % 233280) / 233280;
+  const cells = [];
+  for (let c = 0; c < cols; c++) for (let r = 0; r < 7; r++) {
+    const idx = c * 7 + r;
+    if (idx > todayIdx) { cells[r * cols + c] = 'x'; continue; }
+    const age = todayIdx - idx;
+    cells[r * cols + c] = age < days + 4 && rnd() < 0.9 ? 'l' + (1 + Math.floor(rnd() * 3)) : '';
+  }
+  return cells.map(k => `<i class="${k}"></i>`).join('');
+}
+const DEF = {
+  mode: 'magic', theme: 'light', lang: 'en', frame: 'none', zoom: 1, serif: 'Segoe UI Variable Text', sans: 'Segoe UI Variable Text',
+  sidebar: true, chips: false, fakeCursor: true, mouseSpeed: 1,
+  speed: 1, typeCps: 14, reveal: 'stream', streamCps: 170, charsPerKey: 1, startDelay: 1,
+  hideMouse: true, toasts: true, recents: DEFAULT_RECENTS, models: '',
+};
+const LS_S = 'ccsim.desktop.settings.v3', LS_SCRIPT = 'ccsim.script.v1';
+const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
+let S = Object.assign({}, DEF, (() => { try { return JSON.parse(lsGet(LS_S) || '{}'); } catch { return {}; } })());
+const saveS = () => lsSet(LS_S, JSON.stringify(S));
+const EXAMPLE = $('#example-script').textContent.replace(/^\s*\n/, '');
+const storedScript = lsGet(LS_SCRIPT);
+const firstRun = lsGet(LS_S) == null;
+// An old built-in example saved in the browser is replaced by the current one; a script you wrote is kept.
+const isOldExample = t => (/GUION DE EJEMPLO/.test(t || '') && /agujeros negros/i.test(t || '')) || (/CLAUDE SIMULATOR · EXAMPLE SCRIPT/.test(t || '') && /^@user: Alex$/m.test(t || ''));
+let SCRIPT = storedScript && storedScript.trim() && !isOldExample(storedScript) ? storedScript : EXAMPLE;
+if (storedScript && isOldExample(storedScript)) lsSet(LS_SCRIPT, EXAMPLE);
+// Old default sidebar → the new generic one.
+if (/Interfaz Claude simulada para videos|MCP Obsidian/.test(S.recents || '')) { S.recents = DEFAULT_RECENTS; saveS(); }
+
+// "Effort" slider levels (left to right). "Recommended" = medium.
+const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max', 'ultracode'];
+const REC_EFFORT = 1;
+// Position (%) of each level: at Low and Ultracode the thumb sits flush with the ends of the bar.
+const EPOS = i => 4.07 + i * (91.86 / 5);
+const EFFORT_DELAY = { low: 1300, medium: 2400, high: 3600, xhigh: 4800, max: 6000, ultracode: 8000 };
+const EFFORT_ALIAS = { bajo:'low', baja:'low', low:'low', minimo:'low', medio:'medium', media:'medium', medium:'medium', normal:'medium', alto:'high', alta:'high', high:'high', xhigh:'xhigh', extra:'xhigh', muyalto:'xhigh', altisimo:'xhigh', max:'max', maximo:'max', maxima:'max', maximum:'max', ultracode:'ultracode', ultra:'ultracode' };
+const normEff = q => norm(q).replace(/muy\s+alt[oa]/g, 'muyalto').replace(/extra\s+high/g, 'xhigh');
+let MODELS = [];
+function parseModels(txt) {
+  const out = String(txt || '').split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('//')).map(l => {
+    const p = l.split('|').map(x => x.trim());
+    return { alias: norm(p[0]), name: p[1] || p[0], badge: p[2] || '' };
+  });
+  return out.length ? out : parseModels(DEFAULT_MODELS[S.lang] || DEFAULT_MODELS.en);
+}
+function findModel(q) {
+  q = norm(q).replace(/\s+/g, ' ');
+  if (!q) return null;
+  if (/^(default|predeterminado)$/.test(q)) return MODELS.find(m => m.badge) || MODELS[0];
+  return MODELS.find(m => m.alias === q) || MODELS.find(m => norm(m.name) === q)
+    || MODELS.find(m => norm(m.name).includes(q)) || MODELS.find(m => m.alias && m.alias.includes(q)) || null;
+}
+function parseEffort(q) {
+  for (const w of normEff(q).split(/[\s,;]+/)) if (EFFORT_ALIAS[w]) return EFFORT_ALIAS[w];
+  return null;
+}
+function parseTarget(hid) {
+  const r = { model: null, effort: null, fast: null };
+  const words = normEff(hid).split(/[\s,;]+/).filter(Boolean), rest = [];
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i];
+    if (/^(fast|rapido)$/.test(w)) { r.fast = !(i > 0 && /^(sin|no|off)$/.test(words[i - 1])); continue; }
+    if (/^(sin|no|off|modo|mode)$/.test(w)) continue;
+    if (/^(pensamiento|thinking|extendido|extended)$/.test(w)) { if (!r.effort) r.effort = 'high'; continue; }
+    if (EFFORT_ALIAS[w] && !r.effort) r.effort = EFFORT_ALIAS[w]; else rest.push(w);
+  }
+  if (rest.length) r.model = findModel(rest.join(' ')) || findModel(rest[0]);
+  return r;
+}
+
+/* ════════════════════ Script parser (same as the terminal version) ════════════════════ */
+const BLOCKS = {
+  yo: 'user', user: 'user', usuario: 'user', humano: 'user', human: 'user',
+  claude: 'claude', assistant: 'claude', asistente: 'claude',
+  razonamiento: 'reasoning', pensamiento: 'reasoning', thinking: 'reasoning', reasoning: 'reasoning',
+  tool: 'tool', herramienta: 'tool', 'tool-error': 'toolerr', 'herramienta-error': 'toolerr', toolerror: 'toolerr',
+  editar: 'edit', edit: 'edit', tareas: 'todos', todos: 'todos', todo: 'todos', permiso: 'perm', permission: 'perm',
+};
+const MODE_ALIAS = { normal:'normal', default:'normal', plan:'plan', edits:'edits', edit:'edits', aceptar:'edits', accept:'edits', bypass:'bypass', yolo:'bypass' };
+const DIRS = {
+  pensar: a => { const m = a.match(/^\s*(\d+(?:[.,]\d+)?)\s*(?:s|seg|segundos|sec)?\b\s*(.*)$/i); return m ? { t: 'think', secs: parseFloat(m[1].replace(',', '.')), verb: m[2].trim() || null } : { t: 'think', secs: null, verb: a.trim() || null }; },
+  pausa: a => ({ t: 'pause', secs: num(a) ?? 1 }),
+  modo: a => ({ t: 'mode', mode: MODE_ALIAS[norm(a)] || 'normal' }),
+  contexto: a => ({ t: 'context', pct: num(a) }),
+  titulo: a => ({ t: 'title', text: a.trim() }),
+  error: a => ({ t: 'error', text: a.trim() }),
+  info: a => ({ t: 'info', text: a }),
+  interrumpir: () => ({ t: 'interrupt' }),
+  limpiar: () => ({ t: 'clear' }),
+  compactar: () => ({ t: 'compact' }),
+  elegir: a => ({ t: 'choose', n: Math.max(1, Math.min(3, num(a) || 1)) }),
+  detalle: () => ({ t: 'detail' }),
+  tokens: a => ({ t: 'tokens', n: parseTokens(a) }),
+};
+const DIR_ALIAS = {
+  pensar:'pensar', piensa:'pensar', pensando:'pensar', think:'pensar', thinking:'pensar',
+  pausa:'pausa', pause:'pausa', espera:'pausa', esperar:'pausa', wait:'pausa',
+  modo:'modo', mode:'modo', contexto:'contexto', context:'contexto', titulo:'titulo', title:'titulo',
+  error:'error', info:'info', salida:'info', nota:'info',
+  interrumpir:'interrumpir', interrupt:'interrumpir', esc:'interrumpir',
+  limpiar:'limpiar', clear:'limpiar', compactar:'compactar', compact:'compactar',
+  elegir:'elegir', opcion:'elegir', choose:'elegir', detalle:'detalle', 'ctrl+o':'detalle', detail:'detalle', tokens:'tokens', token:'tokens', gasto:'tokens', consumo:'tokens',
+};
+const TURN = new Set(['claude','reasoning','tool','toolerr','edit','todos','perm','error','interrupt','think']);
+const INTURN = new Set(['pause','mode','context','title','info','detail','tokens']);
+// "3.5M", "3,5 millones", "800k", "1200000" → number of tokens
+function parseTokens(a) {
+  const t = norm(a).replace(/\s+/g, '');
+  const m = t.match(/(\d+(?:[.,]\d+)?)(millones|millon|billones|mil|mm|m|k|b)?/);
+  if (!m) return 0;
+  const v = parseFloat(m[1].replace(',', '.'));
+  const mult = { k: 1e3, mil: 1e3, m: 1e6, mm: 1e6, millones: 1e6, millon: 1e6, b: 1e9, billones: 1e9 }[m[2]] || 1;
+  return Math.round(v * mult);
+}
+// Finds a [tokens] directive inside the turn starting at pc (including loose directives at the end of the turn).
+function turnTokens(steps, pc) {
+  for (let j = pc; j < steps.length && (TURN.has(steps[j].t) || INTURN.has(steps[j].t)); j++) if (steps[j].t === 'tokens') return steps[j].n;
+  return 0;
+}
+function trimBlank(arr) { let a = 0, b = arr.length; while (a < b && !arr[a].trim()) a++; while (b > a && !arr[b - 1].trim()) b--; return arr.slice(a, b); }
+function parseCall(hd) { hd = String(hd || '').trim(); const m = hd.match(/^([^(]+?)\s*\(([\s\S]*)\)\s*$/); return m ? { name: m[1].trim(), args: m[2] } : { name: hd || 'Tool', args: null }; }
+function parseDiff(lines) {
+  let start = 1; const out = [];
+  for (const l of lines) {
+    const m = l.match(/^@@\s*(\d+)/);
+    if (m) { if (!out.length) start = parseInt(m[1], 10); continue; }
+    if (l.startsWith('+')) out.push({ s: '+', text: l.slice(1).replace(/^ /, '') });
+    else if (l.startsWith('-')) out.push({ s: '-', text: l.slice(1).replace(/^ /, '') });
+    else out.push({ s: ' ', text: l.replace(/^ /, '') });
+  }
+  let o = start, n = start;
+  for (const d of out) { if (d.s === ' ') { d.n = n; o++; n++; } else if (d.s === '-') { d.n = o; o++; } else { d.n = n; n++; } }
+  return out;
+}
+function parseTodo(l) {
+  const m = l.match(/^\s*(?:[-*]\s*)?\[(.?)\]\s*(.*)$/);
+  if (!m) return { s: 'pending', text: l.trim() };
+  const k = m[1].toLowerCase();
+  return { s: /[x✓✔]/.test(k) ? 'done' : /[>~\-/]/.test(k) ? 'progress' : 'pending', text: m[2] };
+}
+function finalize(c) {
+  const all = trimBlank([c.head, ...c.lines]);
+  switch (c.t) {
+    case 'user': {
+      let hidden = null;
+      const text = all.join('\n').replace(/\{([^}]*)\}/g, (_, x) => { hidden = (hidden ? hidden + ' ' : '') + x; return ''; }).replace(/[ \t]+$/gm, '').trim();
+      return { t: 'user', text, hidden, line: c.line };
+    }
+    case 'claude': return { t: 'claude', md: all.join('\n'), line: c.line };
+    case 'reasoning': {
+      let text = all.join('\n'), title = null;
+      const m = text.match(/^\s*\[([^\]\n]+)\]\s*/);
+      if (m) { title = m[1].trim(); text = text.slice(m[0].length); }
+      return { t: 'reasoning', text, title, line: c.line };
+    }
+    case 'tool': case 'toolerr': { const { name, args } = parseCall(c.head); return { t: c.t, name, args, out: trimBlank(c.lines), line: c.line }; }
+    case 'perm': {
+      let head = c.head.trim(), desc = '';
+      const m = head.match(/^(.*\))\s*\|\s*(.*)$/);
+      if (m) { head = m[1]; desc = m[2]; }
+      else { const i = head.indexOf('|'); if (i >= 0) { desc = head.slice(i + 1).trim(); head = head.slice(0, i).trim(); } }
+      const { name, args } = parseCall(head);
+      return { t: 'perm', name, args, desc, out: trimBlank(c.lines), choice: 1, line: c.line };
+    }
+    case 'edit': return { t: 'edit', file: c.head.trim() || 'file.txt', diff: parseDiff(trimBlank(c.lines)), line: c.line };
+    case 'todos': return { t: 'todos', items: all.filter(l => l.trim()).map(parseTodo), line: c.line };
+  }
+  return null;
+}
+function compile(src) {
+  const lines = String(src || '').replace(/\r\n?/g, '\n').split('\n');
+  const steps = [], hdr = {}, warn = [];
+  let cur = null, fence = false;
+  const flush = () => { if (cur) { const s = finalize(cur); if (s) steps.push(s); cur = null; } fence = false; };
+  for (let n = 0; n < lines.length; n++) {
+    const raw = lines[n];
+    if (cur && (cur.t === 'claude' || cur.t === 'reasoning')) {
+      if (/^\s*(```|~~~)/.test(raw)) { fence = !fence; cur.lines.push(raw); continue; }
+      if (fence) { cur.lines.push(raw); continue; }
+    }
+    if (/^\/\//.test(raw)) continue;
+    let m;
+    if ((m = raw.match(/^@\s*([^:\s]+)\s*:\s*(.*)$/))) { flush(); hdr[norm(m[1])] = m[2].trim(); continue; }
+    if ((m = raw.match(/^\[\s*([^\s\]]+)\s*(.*?)\s*\]\s*$/)) && DIR_ALIAS[norm(m[1])]) { flush(); steps.push(Object.assign(DIRS[DIR_ALIAS[norm(m[1])]](m[2]), { line: n + 1 })); continue; }
+    if ((m = raw.match(/^([A-Za-zÁÉÍÓÚÜÑáéíóúüñ][A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9_-]*)\s*:(.*)$/)) && BLOCKS[norm(m[1])]) { flush(); cur = { t: BLOCKS[norm(m[1])], head: m[2].replace(/^\s+/, ''), lines: [], line: n + 1 }; continue; }
+    if (/^\/(model|effort|clear|compact)\b/i.test(raw) && (!cur || cur.t === 'user')) { flush(); cur = { t: 'user', head: raw.trim(), lines: [], line: n + 1 }; continue; }
+    if (cur) cur.lines.push(raw);
+    else if (raw.trim()) warn.push(`Line ${n + 1}: text outside a block (missing "user:" or "claude:"?)`);
+  }
+  flush();
+  const out = [];
+  for (const s of steps) {
+    if (s.t === 'choose') { const p = [...out].reverse().find(x => x.t === 'perm'); if (p) p.choice = s.n; else warn.push(`Line ${s.line}: [choose] without a "permission:" before it`); }
+    else out.push(s);
+  }
+  return { steps: out, hdr, warn };
+}
+
+/* ════════════════════ Markdown → HTML (claude.ai style) ════════════════════ */
+const KW = new Set('const let var function return if else for while do switch case break continue new class extends import from export default async await try catch finally throw typeof instanceof in of def lambda pass elif and or not is None True False self public private protected static void int float double bool boolean string struct enum interface type fn mut pub use impl match null undefined true false this yield with as package func go defer chan map range echo fi then done esac print'.split(' '));
+const HASH_LANGS = new Set(['py','python','sh','bash','shell','zsh','rb','ruby','yaml','yml','toml','r','perl','pl','ps1','powershell','dockerfile','make','makefile','conf','ini']);
+const HL_RE = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'|`(?:\\.|[^`\\])*`)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)(?=\s*\()|([A-Za-z_$][\w$]*)/g;
+const HL_RE_HASH = /(#[^\n]*)|("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'|`(?:\\.|[^`\\])*`)|(\b\d+(?:\.\d+)?\b)|([A-Za-z_$][\w$]*)(?=\s*\()|([A-Za-z_$][\w$]*)/g;
+function highlight(code, lang) {
+  const re = HASH_LANGS.has(String(lang || '').toLowerCase()) ? HL_RE_HASH : HL_RE;
+  re.lastIndex = 0;
+  let out = '', last = 0, m;
+  while ((m = re.exec(code))) {
+    out += esc(code.slice(last, m.index));
+    const t = m[0];
+    if (m[1]) out += `<span class="hl-com">${esc(t)}</span>`;
+    else if (m[2]) out += `<span class="hl-str">${esc(t)}</span>`;
+    else if (m[3]) out += `<span class="hl-num">${esc(t)}</span>`;
+    else if (m[4]) out += `<span class="${KW.has(t) ? 'hl-kw' : 'hl-fn'}">${esc(t)}</span>`;
+    else out += KW.has(t) ? `<span class="hl-kw">${esc(t)}</span>` : /^[A-Z]/.test(t) ? `<span class="hl-type">${esc(t)}</span>` : esc(t);
+    last = re.lastIndex;
+  }
+  return out + esc(code.slice(last));
+}
+function inline(s) {
+  s = String(s ?? '');
+  const codes = [];
+  s = s.replace(/`([^`\n]+)`/g, (_, c) => { codes.push(c); return '\u0001' + (codes.length - 1) + '\u0002'; });
+  s = esc(s);
+  s = s.replace(/\*\*(?=\S)([\s\S]*?\S)\*\*/g, '<strong>$1</strong>').replace(/__(?=\S)([\s\S]*?\S)__/g, '<strong>$1</strong>');
+  s = s.replace(/(^|[^*\w])\*(?=\S)([^*\n]*?\S)\*(?!\*)/g, '$1<em>$2</em>');
+  s = s.replace(/(^|[^\w])_(?=\S)([^_\n]*?\S)_(?!\w)/g, '$1<em>$2</em>');
+  s = s.replace(/~~(?=\S)([\s\S]*?\S)~~/g, '<s>$1</s>');
+  s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a>$1</a>');
+  s = s.replace(/\u0001(\d+)\u0002/g, (_, n) => `<code>${esc(codes[+n])}</code>`);
+  return s;
+}
+const splitRow = l => { let s = l.trim(); if (s.startsWith('|')) s = s.slice(1); if (s.endsWith('|')) s = s.slice(0, -1); return s.split('|').map(x => x.trim()); };
+const TABLE_SEP = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
+const LIST_RE = /^(\s*)([-*+]|\d+[.)])\s+(.*)$/;
+const HR_RE = /^\s*([-*_])(\s*\1){2,}\s*$/;
+const isTableAt = (lines, i) => lines[i].includes('|') && i + 1 < lines.length && lines[i + 1].includes('|') && TABLE_SEP.test(lines[i + 1]);
+const isBlockStart = (lines, i) => /^\s*(```|~~~)/.test(lines[i]) || /^#{1,6}\s/.test(lines[i]) || LIST_RE.test(lines[i]) || /^\s*>/.test(lines[i]) || HR_RE.test(lines[i]) || isTableAt(lines, i);
+function listHTML(items) {
+  const indents = [];
+  for (const it of items) {
+    while (indents.length && it.indent < indents[indents.length - 1]) indents.pop();
+    if (!indents.length || it.indent > indents[indents.length - 1]) indents.push(it.indent);
+    it.depth = indents.length - 1;
+  }
+  let html = '';
+  const stack = [];
+  for (const it of items) {
+    while (stack.length && stack[stack.length - 1].depth > it.depth) html += `</li></${stack.pop().tag}>`;
+    const top = stack[stack.length - 1];
+    if (!top || top.depth < it.depth) {
+      const tag = it.ordered ? 'ol' : 'ul';
+      html += `<${tag}${it.ordered && it.num !== 1 ? ` start="${it.num}"` : ''}>`;
+      stack.push({ tag, depth: it.depth });
+    } else html += '</li>';
+    html += `<li>${inline(it.text)}`;
+  }
+  while (stack.length) html += `</li></${stack.pop().tag}>`;
+  return html;
+}
+function mdHTML(src) {
+  const lines = String(src || '').replace(/\r/g, '').split('\n');
+  const out = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!line.trim()) { i++; continue; }
+    let m = line.match(/^\s*(```|~~~)\s*([\w+#.-]*)/);
+    if (m) {
+      const f = m[1], lang = m[2], code = [];
+      i++;
+      while (i < lines.length && !lines[i].trim().startsWith(f)) { code.push(lines[i]); i++; }
+      i++;
+      out.push(`<pre><div class="ch"><span>${esc(lang || 'text')}</span></div><code>${highlight(code.join('\n'), lang)}</code></pre>`);
+      continue;
+    }
+    if ((m = line.match(/^(#{1,6})\s+(.*?)\s*#*\s*$/))) { const d = Math.min(3, m[1].length); out.push(`<h${d}>${inline(m[2])}</h${d}>`); i++; continue; }
+    if (HR_RE.test(line)) { out.push('<hr>'); i++; continue; }
+    if (isTableAt(lines, i)) {
+      const head = splitRow(line);
+      const aligns = splitRow(lines[i + 1]).map(c => /^:-+:$/.test(c) ? 'center' : /-:$/.test(c) ? 'right' : 'left');
+      const rows = [];
+      i += 2;
+      while (i < lines.length && lines[i].includes('|') && lines[i].trim()) { rows.push(splitRow(lines[i])); i++; }
+      const st = c => aligns[c] && aligns[c] !== 'left' ? ` style="text-align:${aligns[c]}"` : '';
+      out.push(`<div class="tbl"><table><thead><tr>${head.map((c, k) => `<th${st(k)}>${inline(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${head.map((_, k) => `<td${st(k)}>${inline(r[k] || '')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`);
+      continue;
+    }
+    if (/^\s*>/.test(line)) {
+      const q = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])) { q.push(lines[i].replace(/^\s*>\s?/, '')); i++; }
+      out.push(`<blockquote>${q.map(inline).join('<br>')}</blockquote>`);
+      continue;
+    }
+    if (LIST_RE.test(line)) {
+      const items = [];
+      while (i < lines.length) {
+        const l = lines[i], mm = l.match(LIST_RE);
+        if (mm) { items.push({ indent: mm[1].replace(/\t/g, '    ').length, ordered: /^\d/.test(mm[2]), num: parseInt(mm[2], 10) || 1, text: mm[3] }); i++; continue; }
+        if (!l.trim()) { let j = i + 1; while (j < lines.length && !lines[j].trim()) j++; if (j < lines.length && LIST_RE.test(lines[j])) { i = j; continue; } break; }
+        if (/^\s+\S/.test(l) && items.length) { items[items.length - 1].text += ' ' + l.trim(); i++; continue; }
+        break;
+      }
+      out.push(listHTML(items));
+      continue;
+    }
+    const p = [];
+    do { p.push(lines[i].replace(/^\s+/, '')); i++; } while (i < lines.length && lines[i].trim() && !isBlockStart(lines, i));
+    out.push(`<p>${p.map(inline).join('<br>')}</p>`);
+  }
+  return out.join('');
+}
+
+/* ════════════════════ Cancelable waits ════════════════════ */
+class Cancel extends Error {}
+let gen = 0;
+const pendings = new Set();
+function track(fn) {
+  return new Promise((res, rej) => {
+    const entry = { reject: rej };
+    pendings.add(entry);
+    fn(v => { pendings.delete(entry); res(v); }, e => { pendings.delete(entry); rej(e); });
+  });
+}
+let turn = null;
+function cancelAll() { gen++; const ps = [...pendings]; pendings.clear(); ps.forEach(p => p.reject(new Cancel())); turn = null; }
+function wait(ms, interruptible = false) {
+  const my = gen;
+  return track(resolve => {
+    let left = Math.max(0, ms) / (S.speed || 1), last = performance.now();
+    const tick = () => {
+      if (my !== gen) return;
+      if (interruptible && turn && turn.interrupted) return resolve('int');
+      const now = performance.now();
+      if (!st.paused) left -= now - last;
+      last = now;
+      if (left <= 0) return resolve();
+      setTimeout(tick, Math.min(30, Math.max(4, left)));
+    };
+    tick();
+  });
+}
+
+/* ════════════════════ State ════════════════════ */
+const st = {
+  steps: [], warn: [], hdr: {}, input: '', model: null, effort: 'medium', thinking: false, fast: false,
+  title: '', titled: false, empty: true, generating: false, menu: null, effortPop: null, micro: null, permWaiter: null,
+  magic: null, free: null, paused: false, detailed: false, waitingStart: false, startResolve: null,
+  playing: false, finished: false, recents: [], cur: -1,
+};
+const elThread = $('#thread'), elScroll = $('#scroll'), elMain = $('#main');
+const scrollBottom = () => { elScroll.scrollTop = elScroll.scrollHeight; };
+
+/* ════════════════════ Interface rendering ════════════════════ */
+function planLabel(p) {
+  const n = norm(p), L = T().plans;
+  if (/max/.test(n)) return L.max;
+  if (/pro/.test(n)) return L.pro;
+  if (/team|equipo/.test(n)) return L.team;
+  if (/free|gratis|gratuito/.test(n)) return L.free;
+  return p;
+}
+function applyTheme() {
+  const r = document.documentElement;
+  r.classList.toggle('dark', S.theme === 'dark');
+  r.style.setProperty('--zoom', S.zoom);
+  r.lang = S.lang;
+}
+// Warns if a chosen font is not available (e.g. Google Fonts offline) and the browser falls back to another.
+async function checkFont(name) {
+  if (!name || name === 'sans' || name === 'system-ui' || !document.fonts) return;
+  try { await document.fonts.load(`20px "${name}"`); } catch {}
+  if (!document.fonts.check(`20px "${name}"`)) toast(`The font "${name}" is not available on this computer, so another one is used.`, 4500);
+}
+function renderStatic() {
+  $$('[data-ic]').forEach(el => { if (el.dataset.done !== el.dataset.ic) { el.innerHTML = ic(el.dataset.ic); el.dataset.done = el.dataset.ic; } });
+  $$('[data-l]').forEach(el => { el.textContent = T()[el.dataset.l]; });
+  $('#side').classList.toggle('hide', !S.sidebar);
+  $('#tbLeft').classList.toggle('hide', !S.sidebar);
+  const H = st.hdr;
+  $('#avatar').innerHTML = spark();
+  $('#uname').textContent = H.user || 'User';
+  $('#uplan').textContent = ' · ' + planLabel(H.plan || 'Claude Max');
+  $('#folderBadge').textContent = H.folder || T().noFolder;
+  const hr = new Date().getHours();
+  $('#greet').innerHTML = '';
+  $('#hgreet').innerHTML = spark() + `<h1>${esc(H.greeting || T().home(H.user || 'there'))}</h1>`;
+  const L = T(), SS = H.stats;
+  $('#stats').innerHTML = `<div class="st-tabs"><span class="on">${L.stTabs[0]}</span><span>${L.stTabs[1]}</span><span class="sp"></span><span class="on">${L.stRanges[0]}</span><span>${L.stRanges[1]}</span><span>${L.stRanges[2]}</span></div>`
+    + `<div class="st-grid">${[SS.sessions, SS.messages, SS.tokens, SS.days, SS.peak, SS.fav].map((v, i) => `<div class="st-tile"><div class="k">${esc(L.stLabels[i])}</div><div class="v${i === 5 ? ' n' : ''}">${esc(v)}</div></div>`).join('')}</div>`
+    + `<div class="heat">${fmtStatsHeat(num(SS.days) || 15, 11)}</div>`
+    + `<div class="st-note">${esc(L.moby(SS.moby))}</div>`;
+  $('#ctxFolder').textContent = H.folder || T().noFolder;
+
+  renderFrame();
+  renderRecents();
+  renderTitle();
+  renderComposer();
+}
+function renderFrame() {
+  $('#stage').className = S.frame === 'none' ? '' : 'framed f-' + S.frame;
+}
+// Sidebar: groups (collapsed, or expanded with their sessions). The script session lives in "Ungrouped".
+function renderRecents(fresh = false) {
+  const gs = st.groups, last = gs.length - 1;
+  $('#groups').innerHTML = gs.map((g, gi) => {
+    const open = g.items.length > 0, isUng = /^(ungrouped|sin grupo)$/i.test(g.name);
+    const acts = isUng ? '' : `<span class="ga"><span>${ic('plus')}</span>${gi === 0 ? `<span>${ic('sliders')}</span>` : ''}</span>`;
+    const head = `<div class="grp${open ? ' open' : ''}"><span class="gn">${esc(g.name)}</span><span class="gc">${ic('chevR')}</span><span class="sp"></span>${acts}</div>`;
+    return head + g.items.map(it => `<div class="ses${it.cur ? ' cur' : ''}${it.cur && fresh ? ' fresh' : ''}"><span class="dot${it.f || it.cur ? ' f' : ''}"></span><span class="tt">${esc(it.t)}</span></div>`).join('');
+  }).join('');
+  $('.nav-item.new').classList.toggle('on', st.empty);
+}function renderTitle() {
+  $('#titleText').textContent = st.titled ? st.title : T().newSession;
+  document.title = st.titled ? `${st.title} - Claude` : 'Claude';
+}
+function renderComposer() {
+  $('#cText').textContent = st.input;
+  $('#cPh').textContent = st.input ? '' : (st.empty ? T().phNew : T().phReply);
+  $('#modelName').textContent = st.model ? st.model.name : '';
+  $('#effortName').textContent = T().efforts[st.effort] || st.effort;
+  $('#effortWarn').innerHTML = st.effort === 'max' ? ic('warn') : '';
+  const sb = $('#sendBtn');
+  sb.classList.toggle('stop', st.generating);
+  sb.innerHTML = ic(st.generating ? 'stop' : 'enter');
+  $('#modelBtn').classList.toggle('is-open', !!st.menu);
+  $('#effortBtn').classList.toggle('is-open', !!st.effortPop);
+  renderBusy();
+}
+function renderBusy() {
+  const b = $('#busy');
+  if (!st.generating) { b.innerHTML = '<span class="ring idle"></span>'; return; }
+  if (!b.querySelector('.ring:not(.idle)')) b.innerHTML = '<span class="bt"></span><span class="ring"></span>';
+  b.querySelector('.bt').textContent = st.tokTarget ? `↓ ${fmtTok(st.tok)} tokens` : '';
+}
+function setEmpty(v) { st.empty = v; elMain.classList.toggle('empty', v); $('#win').classList.toggle('empty', v); $('.nav-item.new').classList.toggle('on', v); renderTitle(); renderComposer(); }
+function setInput(t) { st.input = t; renderComposer(); }
+
+/* Model menu */
+function renderMenu() {
+  const m = $('#menu');
+  if (!st.menu) { m.hidden = true; renderComposer(); return; }
+  const L = T();
+  m.innerHTML = MODELS.map((x, i) => `<div class="mi" data-i="${i}"><div class="mt"><span class="mn">${esc(x.name)}</span>${x.badge ? `<span class="badge">${esc(x.badge)}</span>` : ''}</div><div class="mc">${x === st.model ? ic('check') : `<span class="num">${i + 1}</span>`}</div></div>`).join('')
+    + `<div class="mi more"><div class="mt"><span class="mn">${esc(L.more)}</span></div><div class="mc" style="color:var(--t3)">${ic('chevR')}</div></div>`
+    + `<div class="msep"></div><div class="msec">${esc(L.fastMode)}</div>`
+    + `<div class="mi" data-act="fast"><div class="mt"><span class="mn">${esc(L.enableFast)}</span></div><div class="sw${st.fast ? ' on' : ''}"><i></i></div></div>`;
+  m.hidden = false;
+  const r = $('#modelBtn').getBoundingClientRect();
+  const mh = m.offsetHeight, mw = m.offsetWidth;
+  m.style.left = Math.max(8, Math.min(innerWidth - mw - 8, r.right - mw)) + 'px';
+  m.style.top = (r.bottom + 8 + mh < innerHeight - 8 ? r.bottom + 8 : Math.max(8, r.top - 8 - mh)) + 'px';
+  renderComposer();
+  refreshHover();
+}
+function openMenu() { closeEffort(); st.menu = {}; renderMenu(); }
+function closeMenu() {
+  if (!st.menu) return;
+  st.menu = null;
+  renderMenu();
+  // Only in Free mode does a real mouse selection finish the script step.
+  if (st.micro && st.micro.manual && st.micro.kind === 'model') finishMicro(st.micro);
+}
+function selectModel(i) {
+  if (MODELS[i]) st.model = MODELS[i];
+  closeMenu();
+}
+function toggleFast() { st.fast = !st.fast; renderMenu(); }
+$('#modelBtn').addEventListener('click', e => { e.stopPropagation(); if (st.menu) closeMenu(); else openMenu(); });
+$('#menu').addEventListener('click', e => {
+  e.stopPropagation();
+  const it = e.target.closest('.mi');
+  if (!it) return;
+  if (it.dataset.act === 'fast') toggleFast();
+  else if (it.dataset.i != null) selectModel(+it.dataset.i);
+});
+
+/* Effort picker (slider) */
+function setEffort(e) {
+  st.effort = e;
+  st.thinking = EFFORTS.indexOf(e) >= 2;
+  renderComposer();
+}
+function openEffort() {
+  if (st.menu) closeMenu();
+  st.effortPop = { dragPct: null };
+  const L = T();
+  const p = $('#effortPop');
+  p.innerHTML = `<div class="ep-h"><span class="ep-t">${esc(L.effort)}</span><span class="ep-v" id="epV"></span><span class="ep-q">${HELP_ICON}</span></div>`
+    + `<div class="ep-ends"><span>${esc(L.faster)}</span><span>${esc(L.smarter)}</span></div>`
+    + `<div class="ep-track" id="epTrack"><div class="ep-fill" id="epFill"></div><canvas id="epCanvas"></canvas>${EFFORTS.map((_, i) => i === REC_EFFORT ? `<i class="ep-tick" style="left:${EPOS(i)}%"></i>` : `<i class="ep-dot" style="left:${EPOS(i)}%"></i>`).join('')}<div class="ep-thumb" id="epThumb"></div></div>`
+    + `<div class="ep-rec"><span style="left:${EPOS(REC_EFFORT)}%">${esc(L.recommended)}</span></div>`
+    + `<div class="ep-warn" id="epWarn">${ic('warn')}<span>${esc(L.maxWarn)}</span></div>`;
+  p.hidden = false;
+  syncEffort();
+  renderComposer();
+}
+function syncEffort() {
+  if (!st.effortPop) return;
+  const ultra = st.effort === 'ultracode';
+  const v = $('#epV');
+  v.textContent = T().efforts[st.effort];
+  v.classList.toggle('ultra', ultra);
+  $('#epTrack').classList.toggle('ultra', ultra);
+  const pct = st.effortPop.dragPct != null ? st.effortPop.dragPct : EPOS(EFFORTS.indexOf(st.effort));
+  $('#epThumb').style.left = pct + '%';
+  $('#epFill').style.width = pct + '%';
+  $('#epWarn').hidden = st.effort !== 'max';
+  if (ultra) startUltra(); else stopUltra();
+  // Anchored at the bottom: the "Max" warning makes the popover grow upwards, like the app.
+  const p = $('#effortPop'), r = $('#effortBtn').getBoundingClientRect();
+  p.style.left = Math.max(8, Math.min(innerWidth - p.offsetWidth - 8, r.right - p.offsetWidth + 6)) + 'px';
+  p.style.top = 'auto';
+  p.style.bottom = (innerHeight - r.top + 8) + 'px';
+}
+function closeEffort() {
+  if (!st.effortPop) return;
+  st.effortPop = null;
+  $('#effortPop').hidden = true;
+  stopUltra();
+  renderComposer();
+}
+function effortAtX(cx) {
+  const r = $('#epTrack').getBoundingClientRect();
+  const pct = Math.max(EPOS(0), Math.min(EPOS(EFFORTS.length - 1), (cx - r.left) / r.width * 100));
+  let best = 0;
+  EFFORTS.forEach((_, i) => { if (Math.abs(EPOS(i) - pct) < Math.abs(EPOS(best) - pct)) best = i; });
+  return { pct, idx: best };
+}
+function dragEffortTo(cx) {
+  if (!st.effortPop) return;
+  const { pct, idx } = effortAtX(cx);
+  st.effortPop.dragPct = EPOS(idx); // the slider moves in steps, not continuously
+  if (EFFORTS[idx] !== st.effort) setEffort(EFFORTS[idx]);
+  syncEffort();
+}
+function endEffortDrag() { if (!st.effortPop) return; st.effortPop.dragPct = null; syncEffort(); }
+$('#effortBtn').addEventListener('click', e => { e.stopPropagation(); if (st.effortPop) closeEffort(); else openEffort(); });
+$('#effortPop').addEventListener('click', e => e.stopPropagation());
+$('#effortPop').addEventListener('pointerdown', e => {
+  if (!e.target.closest('#epTrack')) return;
+  e.preventDefault();
+  const sel = window.getSelection && window.getSelection(); if (sel) sel.removeAllRanges();
+  st.effortPop.realDrag = true;
+  dragEffortTo(e.clientX);
+});
+document.addEventListener('pointermove', e => { if (st.effortPop && st.effortPop.realDrag) dragEffortTo(e.clientX); });
+document.addEventListener('pointerup', () => { if (st.effortPop && st.effortPop.realDrag) { st.effortPop.realDrag = false; endEffortDrag(); } });
+
+/* Ultracode animation: pixels drifting right to left, fading from purple to white */
+let ultraRAF = 0;
+const cellHash = (a, b) => { let x = Math.imul(a, 374761393) + Math.imul(b, 668265263) | 0; x = Math.imul(x ^ (x >>> 13), 1274126177); return ((x ^ (x >>> 16)) >>> 0) / 4294967295; };
+function drawUltra(ts) {
+  const c = $('#epCanvas');
+  if (!c || !c.offsetWidth) return;
+  const dpr = devicePixelRatio || 1, W = c.offsetWidth, H = c.offsetHeight;
+  if (c.width !== Math.round(W * dpr) || c.height !== Math.round(H * dpr)) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
+  const ctx = c.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  const dark = document.documentElement.classList.contains('dark');
+  const cell = 2.5, step = 4;
+  const cols = Math.ceil(W / step), rows = Math.max(3, Math.floor((H - 4) / step));
+  const y0 = (H - rows * step + (step - cell)) / 2;
+  const off = Math.floor(ts / 85); // one column every 85 ms → the pixels move left
+  const P = [112, 76, 236], Wc = dark ? [70, 64, 92] : [255, 255, 255];
+  for (let col = 0; col < cols; col++) {
+    const ramp = Math.pow((col + 0.5) / cols, 1.15);
+    for (let r = 0; r < rows; r++) {
+      const n = cellHash(col + off, r * 7 + 3);
+      let v = ramp * 1.5 - (1 - n) * 0.58;
+      if (v <= 0.04) continue;
+      v = Math.min(1, v);
+      const flick = 0.8 + 0.2 * cellHash(col + off, r + 99);
+      const k = v * flick;
+      ctx.fillStyle = `rgba(${Math.round(Wc[0] + (P[0] - Wc[0]) * k)},${Math.round(Wc[1] + (P[1] - Wc[1]) * k)},${Math.round(Wc[2] + (P[2] - Wc[2]) * k)},${(0.45 + 0.55 * v).toFixed(3)})`;
+      ctx.fillRect(col * step, y0 + r * step, cell, cell);
+    }
+  }
+}
+function startUltra() { if (ultraRAF) return; const loop = ts => { drawUltra(ts); ultraRAF = requestAnimationFrame(loop); }; ultraRAF = requestAnimationFrame(loop); }
+function stopUltra() { if (ultraRAF) cancelAnimationFrame(ultraRAF); ultraRAF = 0; }
+
+document.addEventListener('click', e => {
+  if (st.menu && !e.target.closest('#menu')) closeMenu();
+  if (st.effortPop && !e.target.closest('#effortPop')) closeEffort();
+});
+document.addEventListener('click', e => {
+  const th = e.target.closest('.th-head, .tl-head');
+  if (th) th.parentElement.classList.toggle('open');
+  const pb = e.target.closest('.pb');
+  if (pb && st.permWaiter) choosePerm(+pb.dataset.c);
+});
+
+/* Animated cursor: curved path, smooth acceleration, slight jitter and a final correction */
+const cur = $('#fakeCursor');
+const curPos = { x: innerWidth * 0.68, y: innerHeight * 0.9 };
+let curHideT, hovEl = null;
+function setCursor(x, y) {
+  curPos.x = x; curPos.y = y;
+  cur.style.transform = `translate(${(x - 3).toFixed(1)}px,${(y - 2).toFixed(1)}px)`;
+  refreshHover();
+}
+function refreshHover() {
+  let t = null;
+  if (cur.classList.contains('on')) {
+    const el = document.elementFromPoint(curPos.x, curPos.y);
+    t = el && el.closest('.mi, .pb, .nav-item, #modelBtn, #effortBtn, .chip, .act, .cb, #sendBtn');
+  }
+  if (t === hovEl) return;
+  if (hovEl) hovEl.classList.remove('hov');
+  hovEl = t;
+  if (hovEl) hovEl.classList.add('hov');
+}
+function showCursor() {
+  clearTimeout(curHideT);
+  if (cur.classList.contains('on')) return;
+  cur.style.transition = 'opacity .35s';
+  setCursor(curPos.x, curPos.y);
+  cur.classList.add('on');
+}
+function hideCursorSoon() {
+  clearTimeout(curHideT);
+  curHideT = setTimeout(() => { cur.classList.remove('on'); refreshHover(); }, 2200);
+}
+const easeInOut = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const bez = (a, b, c, d, t) => { const u = 1 - t; return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * c + t * t * t * d; };
+async function humanMove(x1, y1, o = {}) {
+  const x0 = curPos.x, y0 = curPos.y, dist = Math.hypot(x1 - x0, y1 - y0);
+  if (dist < 1.5) return;
+  const pace = (o.fast ? 0.8 : 1) / (S.mouseSpeed || 1);
+  const D = Math.min(3200, Math.max(1000, 950 + dist * 1.6)) * pace * (0.88 + Math.random() * 0.24);
+  const ux = (x1 - x0) / dist, uy = (y1 - y0) / dist, nx = -uy, ny = ux;
+  const bend = (Math.random() < 0.5 ? -1 : 1) * Math.min(170, dist * (0.14 + Math.random() * 0.2)) * (o.bend ?? 1);
+  const over = o.noOvershoot ? 0 : Math.min(16, dist * 0.035) * (0.4 + Math.random() * 0.8);
+  const tx = x1 + ux * over, ty = y1 + uy * over;
+  const c1x = x0 + (tx - x0) * 0.3 + nx * bend, c1y = y0 + (ty - y0) * 0.3 + ny * bend;
+  const c2x = x0 + (tx - x0) * 0.75 + nx * bend * 0.45, c2y = y0 + (ty - y0) * 0.75 + ny * bend * 0.45;
+  let t = 0;
+  while (t < 1) {
+    await wait(16);
+    t = Math.min(1, t + 16 / D);
+    const e = easeInOut(t), j = (1 - e) * 0.9;
+    setCursor(bez(x0, c1x, c2x, tx, e) + (Math.random() - 0.5) * j, bez(y0, c1y, c2y, ty, e) + (Math.random() - 0.5) * j);
+    if (o.onMove) o.onMove(curPos.x, curPos.y);
+  }
+  if (over > 0.5) {
+    const sx = curPos.x, sy = curPos.y, D2 = 170 + Math.random() * 140;
+    let u = 0;
+    while (u < 1) {
+      await wait(16);
+      u = Math.min(1, u + 16 / D2);
+      const e = 1 - (1 - u) * (1 - u);
+      setCursor(sx + (x1 - sx) * e, sy + (y1 - sy) * e);
+      if (o.onMove) o.onMove(curPos.x, curPos.y);
+    }
+  }
+}
+function pointIn(el) {
+  const r = el.getBoundingClientRect();
+  const wx = Math.min(r.width * 0.3, 60), wy = r.height * 0.18;
+  return { x: r.left + r.width * 0.5 + (Math.random() - 0.5) * 2 * wx, y: r.top + r.height * 0.52 + (Math.random() - 0.5) * 2 * wy };
+}
+async function clickCursor() { cur.classList.add('click'); await wait(95 + Math.random() * 50); cur.classList.remove('click'); }
+
+/* Mouse actions: automatic, or one per key press */
+async function doAct(a, fast) {
+  const el = a.el();
+  if (!S.fakeCursor || !el) {
+    await wait(fast ? 150 : 400);
+    if (a.drag) { setEffort(a.target); syncEffort(); } else a.run();
+    await wait(fast ? 150 : 350);
+    return;
+  }
+  showCursor();
+  if (a.drag) {
+    const r = el.getBoundingClientRect();
+    await humanMove(r.left + r.width / 2 + (Math.random() - 0.5) * 4, r.top + r.height / 2 + (Math.random() - 0.5) * 6, { fast });
+    await wait((fast ? 120 : 220) + Math.random() * 120);
+    cur.classList.add('click');
+    await wait(80);
+    await humanMove(a.toX(), curPos.y + (Math.random() - 0.5) * 3, { fast, noOvershoot: true, bend: 0.06, onMove: x => dragEffortTo(x) });
+    dragEffortTo(a.toX());
+    await wait(fast ? 110 : 200);
+    cur.classList.remove('click');
+    endEffortDrag();
+    await wait((fast ? 180 : 380) + Math.random() * 160);
+    return;
+  }
+  const p = pointIn(el);
+  await humanMove(p.x, p.y, { fast });
+  await wait((fast ? 110 : 200) + Math.random() * (fast ? 100 : 240));
+  await clickCursor();
+  a.run();
+  refreshHover();
+  await wait((fast ? 180 : 330) + Math.random() * 200);
+}
+function finishMicro(M) { if (st.micro === M) st.micro = null; M.resolve(); }
+async function runActions(kind, acts, driver) {
+  if (driver === 'auto') {
+    await wait(350);
+    for (const a of acts) await doAct(a, false);
+    hideCursorSoon();
+    return;
+  }
+  await track(resolve => { st.micro = { kind, acts, i: 0, resolve, busy: false, manual: driver === 'manual' }; });
+  hideCursorSoon();
+}
+async function microKey(e) {
+  const M = st.micro;
+  if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Dead'].includes(e.key)) return;
+  e.preventDefault();
+  if (M.manual) return;
+  // Keys pressed during an animation are queued: none get lost.
+  if (e.key === 'Enter') M.all = true; else M.queued = (M.queued || 0) + 1;
+  if (M.busy) return;
+  M.busy = true;
+  try {
+    while (st.micro === M && M.i < M.acts.length && (M.all || M.queued > 0)) {
+      if (!M.all) M.queued--;
+      await doAct(M.acts[M.i++], true);
+    }
+  } catch { return; }
+  M.busy = false;
+  if (st.micro === M && M.i >= M.acts.length) finishMicro(M);
+}
+
+/* ════════════════════ Message thread ════════════════════ */
+function addUser(text) {
+  setEmpty(false);
+  elThread.appendChild(h(`<div class="m-user"><div class="bubble">${esc(text)}</div></div>`));
+  scrollBottom();
+}
+function startTurnEl() {
+  const el = h(`<div class="turn"><div class="blocks"></div><div class="status"></div></div>`);
+  elThread.appendChild(el);
+  setStatus(el, null);
+  scrollBottom();
+  return el;
+}
+// Live line at the end of the turn while Claude works (animated dots + timer).
+const DOTS = { wave: 3, pinch: 3, fold: 4 };
+const dotsHTML = kind => `<span class="dots ${kind}">${'<i></i>'.repeat(DOTS[kind])}</span>`;
+const pickDots = () => ['wave', 'pinch', 'fold'][Math.floor(Math.random() * 3)];
+// "··· 19m 55s · 2.9k tokens · Thinking" — updates itself every 250 ms.
+function setStatus(turnEl, verb) {
+  const s = turnEl.querySelector('.status');
+  if (!s) return;
+  s.dataset.t0 = performance.now();
+  s.innerHTML = dotsHTML(Math.random() < 0.5 ? 'wave' : 'pinch') + (verb ? `<span class="sl">${esc(verb)}</span>` : '') + '<span class="sm"></span>';
+  s.dataset.verb = verb ? '1' : '';
+  tickLive();
+}
+const elapsedOf = el => Math.max(0, Math.floor((performance.now() - +el.dataset.t0) / 1000 * (S.speed || 1)));
+function tickLive() {
+  $$('.status', elThread).forEach(s => {
+    const m = s.querySelector('.sm');
+    if (!m) return;
+    const parts = [fmtDur(elapsedOf(s))];
+    if (st.tokTarget) parts.push(`${fmtTok(st.tok)} tokens`);
+    if (!s.dataset.verb) parts.push(T().thinking);
+    m.textContent = parts.join(' · ');
+  });
+  $$('.b-think.live .th-time', elThread).forEach(t => { t.textContent = fmtDur(elapsedOf(t)); });
+}
+setInterval(tickLive, 250);
+function finishTurnEl(el, secs) {
+  const s = el.querySelector('.status');
+  if (s) s.remove();
+  if (st.tokTarget) addBlock(el, `<div class="usage">${esc(T().worked(fmtDur(secs), fmtTok(st.tokTarget)))}</div>`);
+}
+const blocksOf = el => el.querySelector('.blocks');
+function addBlock(turnEl, html) { const b = h(html); blocksOf(turnEl).appendChild(b); scrollBottom(); return b; }
+
+// Live: "⁘ Analyzing slow LLM calls… 20m 27s ›" (four dots folding into the center).
+function addThinking(turnEl, label) {
+  const b = addBlock(turnEl, `<div class="b-think live${st.detailed ? ' open' : ''}"><button class="th-head" tabindex="-1">${dotsHTML('fold')}<span class="th-label">${esc(label)}</span><span class="th-time" data-t0="${performance.now()}"></span>${ic('chevR', 'chev')}</button><div class="th-body"></div></div>`);
+  tickLive();
+  return b;
+}
+function finishThinking(b, title, text, secs) {
+  const lab = b.querySelector('.th-label');
+  b.classList.remove('live');
+  const d = b.querySelector('.dots');
+  if (d) d.remove();
+  lab.textContent = title || T().thoughtFor(secs);
+  b.querySelector('.th-time').textContent = title ? fmtDur(secs) : '';
+  b.querySelector('.th-body').textContent = text || '';
+  if (!text) b.querySelector('.th-body').remove();
+}
+function toolInfo(name, args) {
+  const n = norm(name), a = String(args ?? '').trim().replace(/^["'](.*)["']$/, '$1'), L = T();
+  if (/search|busca/.test(n)) return { icon: 'globe', label: `${L.searched} “${a}”` };
+  if (/fetch/.test(n)) return { icon: 'globe', label: `${L.fetched} ${a}` };
+  if (n === 'bash' || /terminal|shell|command/.test(n)) return { icon: 'terminal', label: `${L.ran} ${a}` };
+  if (/read|leer/.test(n)) return { icon: 'file', label: `${L.read} ${a}` };
+  if (/write|edit|update/.test(n)) return { icon: 'pencil', label: `${L.edited} ${a}` };
+  return { icon: 'wrench', label: a ? `${name}: ${a}` : name };
+}
+function addTool(turnEl, info) {
+  return addBlock(turnEl, `<div class="b-tool${st.detailed ? ' open' : ''}"><button class="tl-head" tabindex="-1"><span class="tl-label shimmer">${esc(info.label)}</span><span class="tl-meta"></span>${ic('chevR', 'chev')}</button><div class="tl-body"></div></div>`);
+}
+function finishTool(b, meta, bodyHTML, isErr) {
+  b.querySelector('.tl-label').classList.remove('shimmer');
+  const m = b.querySelector('.tl-meta');
+  m.textContent = meta ? ` · ${meta}` : '';
+  m.classList.toggle('err', !!isErr);
+  const body = b.querySelector('.tl-body');
+  if (bodyHTML) body.innerHTML = bodyHTML; else body.remove();
+}
+
+/* ════════════════════ Playback engine ════════════════════ */
+const driverFor = () => S.mode === 'auto' ? 'auto' : S.mode === 'magic' ? 'magic' : 'manual';
+const isUiSlash = t => /^\/(model|effort|clear|compact)\b/i.test(String(t).trim());
+function typeDelay(ch) {
+  let d = (1000 / S.typeCps) * (0.55 + Math.random() * 0.9);
+  if (ch === ' ') d *= 1.25;
+  if (/[.,;:!?¿¡]/.test(ch)) d *= 2.2;
+  if (Math.random() < 0.04) d += 220 + Math.random() * 260;
+  return d;
+}
+async function typeInput(text) {
+  if (S.mode === 'auto') {
+    await wait(320);
+    const ch = [...text];
+    for (let i = 0; i < ch.length; i++) { setInput(ch.slice(0, i + 1).join('')); await wait(typeDelay(ch[i])); }
+    await wait(450);
+  } else {
+    await track(resolve => { st.magic = { chars: [...text], pos: 0, resolve, finishing: false }; setInput(''); });
+  }
+}
+const freeInput = () => track(resolve => { st.free = { resolve }; });
+async function sendMessage(text) {
+  const sb = $('#sendBtn');
+  sb.classList.add('press');
+  setTimeout(() => sb.classList.remove('press'), 120);
+  setInput('');
+  addUser(text);
+}
+const effortDelay = () => (EFFORT_DELAY[st.effort] || 2400) * (st.thinking ? 1 : 0.6) * (0.85 + Math.random() * 0.3);
+function continuesTurn(steps, pc) {
+  for (let j = pc; j < steps.length; j++) { if (TURN.has(steps[j].t)) return true; if (!INTURN.has(steps[j].t)) return false; }
+  return false;
+}
+
+async function run() {
+  try {
+    if (S.mode === 'auto') {
+      st.waitingStart = true; updateRunState();
+      await track(r => { st.startResolve = r; });
+      st.waitingStart = false; st.startResolve = null;
+      await wait(S.startDelay * 1000);
+    }
+    st.playing = true; updateRunState();
+    const steps = st.steps;
+    let pc = 0;
+    while (pc < steps.length) {
+      const s = steps[pc];
+      if (s.t === 'user') {
+        if (S.mode === 'free') { pc = await freeStep(steps, pc); continue; }
+        pc++;
+        if (isUiSlash(s.text)) { await runSlash(s.text, s.hidden, driverFor()); continue; }
+        await typeInput(s.text);
+        await sendMessage(s.text);
+        pc = await runTurn(steps, pc);
+      } else if (TURN.has(s.t)) pc = await runTurn(steps, pc);
+      else { await runMeta(s); pc++; }
+    }
+    st.playing = false; st.finished = true; updateRunState();
+    if (S.mode === 'free') {
+      for (;;) {
+        const t = (await freeInput()).trim();
+        if (isUiSlash(t)) await runSlash(t, null, 'manual'); else await sendMessage(t);
+      }
+    }
+  } catch (e) { if (!(e instanceof Cancel)) console.error(e); }
+}
+async function freeStep(steps, pc) {
+  const t = (await freeInput()).trim();
+  if (isUiSlash(t)) {
+    const cmd = t.split(/\s+/)[0].toLowerCase();
+    if (steps[pc].text.split(/\s+/)[0].toLowerCase() === cmd) pc++;
+    await runSlash(t, null, 'manual');
+    return pc;
+  }
+  while (pc < steps.length && steps[pc].t === 'user' && isUiSlash(steps[pc].text)) pc++;
+  if (pc < steps.length && steps[pc].t === 'user') pc++;
+  await sendMessage(t);
+  return runTurn(steps, pc);
+}
+async function runTurn(steps, pc) {
+  const Tn = { interrupted: false, t0: performance.now() };
+  turn = Tn;
+  st.generating = true;
+  // [tokens X]: the counter climbs during the turn until it reaches X.
+  st.tokTarget = turnTokens(steps, pc);
+  st.tok = 0;
+  const tokTimer = st.tokTarget ? setInterval(() => {
+    if (turn !== Tn) { clearInterval(tokTimer); return; }
+    if (st.paused) return;
+    st.tok += Math.max(st.tokTarget * 0.004, (st.tokTarget - st.tok) * 0.035);
+    if (st.tok > st.tokTarget * 0.97) st.tok = st.tokTarget * 0.97;
+    renderBusy();
+  }, 60) : 0;
+  renderComposer();
+  const turnEl = startTurnEl();
+  Tn.el = turnEl;
+  let first = true, pendingThink = null, verb = null;
+  while (pc < steps.length) {
+    const s = steps[pc];
+    if (!TURN.has(s.t) && !(INTURN.has(s.t) && continuesTurn(steps, pc))) break;
+    pc++;
+    if (Tn.interrupted) continue;
+    if (s.t === 'think') { if (s.secs != null) pendingThink = s.secs; if (s.verb) verb = s.verb; continue; }
+    if (s.t === 'pause') { await wait(s.secs * 1000, true); continue; }
+    if (INTURN.has(s.t)) { await runMeta(s); continue; }
+    if (s.t === 'interrupt') { if (pendingThink != null) await wait(pendingThink * 1000, true); Tn.interrupted = true; continue; }
+    const ms = pendingThink != null ? pendingThink * 1000 : first ? effortDelay() : 600 + Math.random() * 700;
+    pendingThink = null;
+    const showThink = s.t === 'reasoning' || !!verb || (first && st.thinking);
+    const tb = showThink ? addThinking(turnEl, verb || T().thinking) : null;
+    // While the thinking block is live, the status line hides so the phrase is not shown twice.
+    const stEl = turnEl.querySelector('.status');
+    if (stEl) stEl.hidden = !!tb;
+    await wait(ms, true);
+    const secs = Math.max(1, Math.round(ms / 1000));
+    if (tb) {
+      const rs = s.t === 'reasoning' ? s : null;
+      finishThinking(tb, (rs && rs.title) || verb || null, rs ? rs.text : '', secs);
+    }
+    if (stEl) stEl.hidden = false;
+    verb = null;
+    if (Tn.interrupted) continue;
+    first = false;
+    if (s.t === 'reasoning') continue;
+    await runVisible(s, Tn, turnEl);
+  }
+  st.generating = false;
+  clearInterval(tokTimer);
+  st.tok = st.tokTarget;
+  if (Tn.interrupted) addBlock(turnEl, `<div class="note">${esc(T().interrupted)}</div>`);
+  finishTurnEl(turnEl, Math.max(1, Math.round((performance.now() - Tn.t0) / 1000 * (S.speed || 1))));
+  st.tokTarget = 0;
+  renderComposer();
+  turn = null;
+  if (!st.titled) applyTitle();
+  scrollBottom();
+  return pc;
+}
+async function runVisible(s, Tn, turnEl) {
+  switch (s.t) {
+    case 'claude': {
+      const b = addBlock(turnEl, '<div class="b-text"></div>');
+      if (S.reveal === 'stream') {
+        const words = s.md.split(/(\s+)/);
+        let shown = '';
+        for (let i = 0; i < words.length && !Tn.interrupted;) {
+          const n = 1 + Math.floor(Math.random() * 3);
+          let chunk = '';
+          for (let k = 0; k < n * 2 && i < words.length; k++) chunk += words[i++];
+          shown += chunk;
+          b.innerHTML = mdHTML(shown);
+          scrollBottom();
+          await wait(Math.max(12, chunk.length * 1000 / S.streamCps), true);
+        }
+      } else b.innerHTML = mdHTML(s.md);
+      scrollBottom();
+      break;
+    }
+    case 'tool': case 'toolerr': {
+      const b = addTool(turnEl, toolInfo(s.name, s.args));
+      await wait(900 + Math.random() * 900, true);
+      const body = s.out.length ? s.out.map(esc).join('\n') : '';
+      finishTool(b, Tn.interrupted ? '' : (s.out[0] || ''), Tn.interrupted ? '' : body, s.t === 'toolerr');
+      break;
+    }
+    case 'edit': {
+      const b = addTool(turnEl, { icon: 'pencil', label: `${T().edited} ${s.file}` });
+      await wait(700 + Math.random() * 500, true);
+      const add = s.diff.filter(d => d.s === '+').length, del = s.diff.filter(d => d.s === '-').length;
+      const body = s.diff.map(d => `<span class="dl ${d.s === '+' ? 'add' : d.s === '-' ? 'del' : ''}">${d.s === ' ' ? ' ' : d.s} ${esc(d.text)}</span>`).join('');
+      finishTool(b, `+${add} −${del}`, body, false);
+      break;
+    }
+    case 'todos':
+      addBlock(turnEl, `<div class="todo-card"><div class="tt">${esc(T().todos)}</div>${s.items.map(x => `<div class="todo ${x.s === 'done' ? 'done' : x.s === 'progress' ? 'prog' : ''}"><span class="bx">${x.s === 'done' ? ic('check') : ''}</span><span>${inline(x.text)}</span></div>`).join('')}</div>`);
+      break;
+    case 'perm': {
+      const info = toolInfo(s.name, s.args), L = T();
+      const card = addBlock(turnEl, `<div class="perm"><div class="perm-h">${ic(info.icon)}<span>${esc(L.allowQ(s.name))}</span></div>${s.args != null ? `<div class="perm-cmd">${esc(s.args)}</div>` : ''}${s.desc ? `<div class="perm-d">${esc(s.desc)}</div>` : ''}<div class="perm-b"><button class="pb" data-c="3" tabindex="-1">${esc(L.deny)}</button><button class="pb" data-c="2" tabindex="-1">${esc(L.always)}</button><button class="pb pri" data-c="1" tabindex="-1">${esc(L.once)}</button></div></div>`);
+      const target = s.choice || 1;
+      const p = track(resolve => { st.permWaiter = { resolve, card }; });
+      const driver = driverFor();
+      if (driver !== 'manual') runActions('perm', [{ el: () => card.querySelector(`.pb[data-c="${target}"]`), run: () => choosePerm(target) }], driver).catch(() => {});
+      const choice = await p;
+      if (choice === 3) {
+        const b = addTool(turnEl, info);
+        finishTool(b, L.denied, '', true);
+        Tn.interrupted = true;
+      } else {
+        const b = addTool(turnEl, info);
+        await wait(800 + Math.random() * 700, true);
+        finishTool(b, Tn.interrupted ? '' : (s.out[0] || ''), s.out.length && !Tn.interrupted ? s.out.map(esc).join('\n') : '', false);
+      }
+      break;
+    }
+    case 'error':
+      addBlock(turnEl, `<div class="err-box">${esc(s.text && !/^API Error/i.test(s.text) ? s.text : T().capacity)}</div>`);
+      break;
+  }
+}
+function choosePerm(c) {
+  const W = st.permWaiter;
+  if (!W) return;
+  st.permWaiter = null;
+  W.card.remove();
+  if (st.micro && st.micro.kind === 'perm') finishMicro(st.micro);
+  W.resolve(c);
+}
+async function runMeta(s) {
+  switch (s.t) {
+    case 'pause': await wait(s.secs * 1000); break;
+    case 'title': st.title = s.text; if (st.titled && st.curItem) { st.curItem.t = s.text; renderRecents(); } renderTitle(); break;
+    case 'info': {
+      // Inside a turn it goes in place (before whatever comes next), not at the end of the thread.
+      const el = h(`<div class="info">${inline(s.text)}</div>`);
+      if (turn && turn.el) blocksOf(turn.el).appendChild(el); else elThread.appendChild(el);
+      scrollBottom();
+      break;
+    }
+    case 'clear': await newChatFlow(driverFor()); break;
+    case 'compact': await compactFlow(); break;
+    case 'detail': toggleDetail(); break;
+  }
+}
+function applyTitle() {
+  if (st.empty) return;
+  const first = elThread.querySelector('.bubble');
+  st.title = st.title || (first ? first.textContent.trim().replace(/\s+/g, ' ').slice(0, 42) : 'New chat');
+  st.titled = true;
+  let ung = st.groups.find(g => /^(ungrouped|sin grupo)$/i.test(g.name));
+  if (!ung) { ung = { name: 'Ungrouped', items: [] }; st.groups.push(ung); }
+  st.groups.forEach(g => g.items.forEach(i => { i.cur = false; }));
+  st.curItem = { t: st.title, cur: true };
+  ung.items.unshift(st.curItem);
+  renderRecents(true);
+  renderTitle();
+}
+async function modelFlow(tg, driver) {
+  if (driver === 'manual') { openMenu(); await runActions('model', [], 'manual'); return; }
+  const tModel = tg.model || st.model, tIdx = MODELS.indexOf(tModel);
+  const tEffort = tg.effort || st.effort;
+  const tFast = tg.fast != null ? tg.fast : st.fast;
+  const acts = [];
+  if (tModel !== st.model || tFast !== st.fast) {
+    acts.push({ el: () => $('#modelBtn'), run: () => openMenu() });
+    if (tFast !== st.fast) acts.push({ el: () => $('#menu [data-act="fast"] .sw'), run: () => toggleFast() });
+    acts.push({ el: () => $(`#menu [data-i="${tIdx}"]`), run: () => selectModel(tIdx) });
+  }
+  if (tEffort !== st.effort) {
+    acts.push({ el: () => $('#effortBtn'), run: () => openEffort() });
+    acts.push({
+      drag: true, target: tEffort, el: () => $('#epThumb'),
+      toX: () => { const r = $('#epTrack').getBoundingClientRect(); return r.left + r.width * EPOS(EFFORTS.indexOf(tEffort)) / 100; },
+    });
+    acts.push({ el: () => $('#cInput'), run: () => closeEffort() });
+  }
+  if (acts.length) await runActions('model', acts, driver);
+}
+async function newChatFlow(driver) {
+  const go = () => {
+    elThread.innerHTML = '';
+    st.titled = false; st.title = ''; st.cur = -1;
+    if (st.curItem) { st.curItem.cur = false; st.curItem = null; }
+    renderRecents();
+    setEmpty(true);
+  };
+  if (driver === 'manual' || !S.sidebar) { go(); return; }
+  await runActions('new', [{ el: () => $('.nav-item.new'), run: go }], driver);
+}
+async function compactFlow() {
+  const card = h(`<div class="compact-card"><span class="mini-spin"></span><span class="shimmer">${esc(T().compacting)}</span></div>`);
+  elThread.appendChild(card);
+  scrollBottom();
+  await wait(3200);
+  card.replaceWith(h(`<div class="divider">${esc(T().compacted)}</div>`));
+  scrollBottom();
+}
+async function runSlash(text, hidden, driver) {
+  const parts = text.trim().split(/\s+/), cmd = parts[0].toLowerCase(), arg = parts.slice(1).join(' ');
+  setInput('');
+  if (cmd === '/model' || cmd === '/effort') await modelFlow(parseTarget(`${arg} ${hidden || ''}`), driver);
+  else if (cmd === '/clear') await newChatFlow(driver);
+  else if (cmd === '/compact') await compactFlow();
+}
+
+/* ════════════════════ Keyboard ════════════════════ */
+function magicKey(e) {
+  const M = st.magic;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    if (M.finishing) return;
+    M.finishing = true;
+    (async () => {
+      try {
+        while (M.pos < M.chars.length) { M.pos = Math.min(M.chars.length, M.pos + 2); setInput(M.chars.slice(0, M.pos).join('')); await wait(16); }
+        await wait(120);
+        st.magic = null;
+        M.resolve();
+      } catch {}
+    })();
+    return;
+  }
+  if (e.key === 'Backspace') { e.preventDefault(); if (!M.finishing && M.pos > 0) { M.pos--; setInput(M.chars.slice(0, M.pos).join('')); } return; }
+  if (e.key.length === 1) {
+    e.preventDefault();
+    if (M.finishing) return;
+    M.pos = Math.min(M.chars.length, M.pos + S.charsPerKey);
+    setInput(M.chars.slice(0, M.pos).join(''));
+  }
+}
+function freeKey(e) {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    if (e.shiftKey) { setInput(st.input + '\n'); return; }
+    if (!st.input.trim()) return;
+    const F = st.free, t = st.input;
+    st.free = null;
+    F.resolve(t);
+    return;
+  }
+  if (e.key === 'Backspace') { e.preventDefault(); setInput([...st.input].slice(0, -1).join('')); return; }
+  if (e.key.length === 1) { e.preventDefault(); setInput(st.input + e.key); }
+}
+function toggleDetail() {
+  st.detailed = !st.detailed;
+  $$('.b-think, .b-tool', elThread).forEach(b => b.classList.toggle('open', st.detailed));
+  scrollBottom();
+}
+function startNow() { if (st.startResolve) { const r = st.startResolve; st.startResolve = null; r(); } }
+function playPause() {
+  if (st.waitingStart) { startNow(); return; }
+  if (st.finished) { restart(); startNow(); return; }
+  if (!st.playing) return;
+  st.paused = !st.paused;
+  toast(st.paused ? '⏸ Paused' : '▶ Resumed');
+  updateRunState();
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'F2') { e.preventDefault(); togglePanel(); return; }
+  if (e.key === 'F9') { e.preventDefault(); restart(); toast(S.mode === 'auto' ? '↺ Restarted · Space to start' : '↺ Restarted'); return; }
+  if (e.key === 'F8') { e.preventDefault(); playPause(); return; }
+  if (panelIsOpen()) { if (e.key === 'Escape') { e.preventDefault(); togglePanel(false); } return; }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'o' || e.key === 'O')) { e.preventDefault(); toggleDetail(); return; }
+  if (e.key === 'Tab') { e.preventDefault(); return; }
+  if (st.micro) { microKey(e); return; }
+  if (e.key === 'Escape') { e.preventDefault(); if (st.menu) closeMenu(); else if (st.effortPop) closeEffort(); else if (turn && !turn.interrupted) turn.interrupted = true; return; }
+  if (st.magic) { magicKey(e); return; }
+  if (st.free) { freeKey(e); return; }
+  if (st.waitingStart && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); startNow(); return; }
+  if (S.mode === 'auto' && st.playing && e.key === ' ') { e.preventDefault(); playPause(); }
+});
+document.addEventListener('paste', e => {
+  if (panelIsOpen() || !st.free) return;
+  e.preventDefault();
+  setInput(st.input + (e.clipboardData || window.clipboardData).getData('text'));
+});
+$('#sendBtn').addEventListener('click', () => {
+  if (st.generating && turn) { turn.interrupted = true; return; }
+  if (st.free && st.input.trim()) { const F = st.free; st.free = null; F.resolve(st.input); }
+});
+let mouseT;
+document.addEventListener('pointermove', () => {
+  document.body.classList.remove('nocursor');
+  clearTimeout(mouseT);
+  if (S.hideMouse) mouseT = setTimeout(() => { if (!panelIsOpen()) document.body.classList.add('nocursor'); }, 1500);
+});
+let toastT;
+function toast(msg, ms = 1500) {
+  if (!S.toasts) return;
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove('show'), ms);
+}
+
+/* ════════════════════ Restart ════════════════════ */
+function resetState() {
+  MODELS = parseModels(S.models);
+  const { steps, hdr, warn } = compile(SCRIPT);
+  const H = keys => { for (const k of keys) if (hdr[k] != null && hdr[k] !== '') return hdr[k]; return null; };
+  st.steps = steps; st.warn = warn;
+  const cwd = H(['carpeta', 'cwd', 'directorio', 'dir', 'ruta']);
+  st.hdr = {
+    user: H(['usuario', 'user', 'nombre', 'name']) ?? '', plan: H(['plan', 'cuenta']) ?? 'Claude Max', greeting: H(['saludo', 'greeting']),
+    folder: cwd ? cwd.split(/[\\/]/).filter(Boolean).pop() : '',
+  };
+  st.model = findModel(H(['modelo', 'model']) || '') || MODELS[0];
+  st.effort = parseEffort(H(['esfuerzo', 'effort']) || '') || 'medium';
+  st.thinking = EFFORTS.indexOf(st.effort) >= 2;
+  st.fast = /^(si|sí|yes|on|true|1)$/.test(norm(H(['rapido', 'fast']) || ''));
+  const tg = H(['titulo', 'title']) || '';
+  st.groups = parseGroups(S.recents || DEFAULT_RECENTS);
+  st.curItem = null;
+  st.hdr.stats = {
+    sessions: H(['sesiones', 'sessions']) || '41', messages: H(['mensajes', 'messages']) || '36,990',
+    tokens: H(['tokenstotales', 'tokens_totales', 'totaltokens']) || '13.2B', days: H(['diasactivos', 'dias_activos', 'activedays']) || '15',
+    peak: H(['horapico', 'hora_pico', 'peakhour']) || '11 PM', fav: H(['modelofavorito', 'modelo_favorito', 'favoritemodel']) || 'Opus 5.5',
+    moby: H(['moby', 'mobydick']) || '49142',
+  };
+  closeEffort();
+  Object.assign(st, { tok: 0, tokTarget: 0, title: tg, titled: false, cur: -1, input: '', generating: false, menu: null, effortPop: null, micro: null, permWaiter: null, magic: null, free: null, paused: false, waitingStart: false, startResolve: null, playing: false, finished: false });
+  turn = null;
+  elThread.innerHTML = '';
+  $('#menu').hidden = true;
+  cur.classList.remove('on');
+  setEmpty(true);
+}
+function restart() {
+  cancelAll();
+  applyTheme();
+  resetState();
+  renderStatic();
+  updateParseStatus();
+  run();
+}
+
+/* ════════════════════ Control panel ════════════════════ */
+const MODE_HINTS = {
+  magic: 'Go at your own pace: every key you press types the next letter of your scripted line (9 keys = 9 letters). <kbd>Enter</kbd> sends it and Claude answers. In the model picker and permission cards, each key is one cursor click.',
+  auto: 'Everything plays by itself: typing, cursor and answers. Press <kbd>Space</kbd> or <kbd>F8</kbd> to start and to pause.',
+  free: 'Type whatever you want for real. When you press <kbd>Enter</kbd>, Claude answers with its next scripted turn. Switch models with the real mouse.',
+};
+const panelIsOpen = () => $('#panel').classList.contains('open');
+function togglePanel(force) {
+  const p = $('#panel');
+  const open = force ?? !p.classList.contains('open');
+  p.classList.toggle('open', open);
+  if (open) { syncPanel(); document.body.classList.remove('nocursor'); }
+  else if (document.activeElement && p.contains(document.activeElement)) document.activeElement.blur();
+}
+function updateRunState() {
+  const el = $('#runState');
+  let cls = '', txt = 'Ready';
+  if (st.waitingStart) { cls = 'wait'; txt = 'Waiting: press Space, Enter or F8 to start'; }
+  else if (st.finished) txt = 'Script finished · F9 to replay';
+  else if (st.playing && st.paused) { cls = 'pause'; txt = 'Paused · F8 to resume'; }
+  else if (st.playing) { cls = 'play'; txt = S.mode === 'auto' ? 'Playing' : 'Live: type on your keyboard'; }
+  el.className = 'state ' + cls;
+  el.querySelector('span').textContent = txt;
+}
+function updateParseStatus() {
+  const { steps, warn } = compile(SCRIPT);
+  const users = steps.filter(s => s.t === 'user').length, claude = steps.filter(s => s.t === 'claude').length;
+  $('#parseStatus').innerHTML = `✓ ${users} ${users === 1 ? 'message' : 'messages'} from you · ${claude} ${claude === 1 ? 'answer' : 'answers'} from Claude`
+    + warn.slice(0, 4).map(w => `<span class="w">⚠ ${esc(w)}</span>`).join('');
+}
+function syncPanel() {
+  $$('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.mode === S.mode));
+  $('#modeHint').innerHTML = MODE_HINTS[S.mode];
+  $$('[data-k]').forEach(el => {
+    const k = el.dataset.k;
+    if (el.type === 'checkbox') el.checked = !!S[k];
+    else if (document.activeElement !== el) el.value = k === 'models' && !S.models ? (DEFAULT_MODELS[S.lang] || DEFAULT_MODELS.en) : S[k];
+  });
+  $$('output[data-o]').forEach(o => {
+    const k = o.dataset.o, v = S[k];
+    o.textContent = (k === 'speed' || k === 'mouseSpeed') ? Number(v).toFixed(2) + '×' : k === 'zoom' ? Math.round(v * 100) + '%' : String(v);
+  });
+  updateRunState();
+}
+function initPanel() {
+  const ta = $('#script');
+  ta.value = SCRIPT;
+  let tmr;
+  ta.addEventListener('input', () => { SCRIPT = ta.value; clearTimeout(tmr); tmr = setTimeout(() => { lsSet(LS_SCRIPT, SCRIPT); updateParseStatus(); }, 300); });
+  ta.addEventListener('keydown', e => { if (e.key === 'Tab' && !e.shiftKey) { e.preventDefault(); ta.setRangeText('  ', ta.selectionStart, ta.selectionEnd, 'end'); ta.dispatchEvent(new Event('input')); } });
+  $$('#panel nav button').forEach(b => b.addEventListener('click', () => {
+    $$('#panel nav button').forEach(x => x.classList.toggle('on', x === b));
+    $$('#panel section').forEach(s => s.classList.toggle('on', s.dataset.pane === b.dataset.tab));
+  }));
+  $('#pClose').addEventListener('click', () => togglePanel(false));
+  $$('#modeSeg button').forEach(b => b.addEventListener('click', () => { S.mode = b.dataset.mode; saveS(); syncPanel(); restart(); }));
+  $('#bPlay').addEventListener('click', () => { lsSet(LS_SCRIPT, SCRIPT); togglePanel(false); restart(); startNow(); });
+  $('#bRestart').addEventListener('click', () => { lsSet(LS_SCRIPT, SCRIPT); restart(); toast('↺ Restarted'); });
+  $('#bFull').addEventListener('click', () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+  });
+  $('#bOpen').addEventListener('click', () => $('#fileIn').click());
+  $('#fileIn').addEventListener('change', async e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    ta.value = SCRIPT = await f.text();
+    lsSet(LS_SCRIPT, SCRIPT);
+    e.target.value = '';
+    restart();
+  });
+  $('#bSave').addEventListener('click', () => {
+    const t = compile(SCRIPT).hdr;
+    const name = String(t.titulo || t.title || 'script').replace(/[\\/:*?"<>|]+/g, '').trim().replace(/\s+/g, '-') || 'script';
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([SCRIPT], { type: 'text/plain;charset=utf-8' }));
+    a.download = name + '.txt';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  });
+  $('#bExample').addEventListener('click', () => {
+    if (SCRIPT.trim() && SCRIPT !== EXAMPLE && !confirm('Replace your current script with the example?')) return;
+    ta.value = SCRIPT = EXAMPLE;
+    lsSet(LS_SCRIPT, SCRIPT);
+    restart();
+  });
+  $('#bModelsReset').addEventListener('click', () => { S.models = ''; saveS(); syncPanel(); restart(); });
+  $('#bSettingsReset').addEventListener('click', () => {
+    if (!confirm('Reset all settings?')) return;
+    S = Object.assign({}, DEF, { mode: S.mode });
+    saveS(); syncPanel(); restart();
+  });
+  $$('#insRow button').forEach(b => b.addEventListener('click', () => {
+    const snip = b.dataset.snip, a = ta.selectionStart, before = ta.value.slice(0, a);
+    const pre = before && !before.endsWith('\n') ? '\n' : '';
+    ta.setRangeText(pre + snip + '\n', a, ta.selectionEnd, 'end');
+    ta.focus();
+    ta.dispatchEvent(new Event('input'));
+  }));
+  $$('[data-k]').forEach(el => {
+    const k = el.dataset.k;
+    const ev = (el.tagName === 'SELECT' || el.type === 'checkbox') ? 'change' : 'input';
+    el.addEventListener(ev, () => {
+      let v = el.type === 'checkbox' ? el.checked : (el.type === 'number' || el.type === 'range') ? parseFloat(el.value) : el.value;
+      if ((el.type === 'number' || el.type === 'range') && !isFinite(v)) return;
+      S[k] = v;
+      saveS();
+      syncPanel();
+      applyTheme();
+      if (k === 'models') { MODELS = parseModels(S.models); st.model = findModel(st.model ? st.model.name : '') || MODELS[0]; }
+      if (k === 'lang' && !S.models) { const name = st.model && st.model.name; MODELS = parseModels(''); st.model = findModel(name || '') || MODELS[0]; }
+      if (k === 'recents') { st.groups = parseGroups(S.recents); if (st.curItem) { let u = st.groups.find(g => /^(ungrouped|sin grupo)$/i.test(g.name)); if (!u) { u = { name: 'Ungrouped', items: [] }; st.groups.push(u); } u.items.unshift(st.curItem); } }
+      renderStatic();
+      if (st.menu) renderMenu();
+    });
+  });
+  syncPanel();
+  updateParseStatus();
+}
+
+/* ════════════════════ Startup ════════════════════ */
+applyTheme();
+clawdIdle();
+initPanel();
+resetState();
+renderStatic();
+run();
+if (firstRun) togglePanel(true);
+else toast(S.mode === 'auto' ? 'F2 · script panel · Space to start' : S.mode === 'magic' ? 'F2 · script panel · type to write your line' : 'F2 · script panel', 2600);
+})();
+</script>
+</body>
+</html>
