@@ -52,6 +52,12 @@ const P = {
   enter: '<path d="M20 5v7a3 3 0 0 1-3 3H5M9 11l-4 4 4 4"/>',
   mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3"/>',
   bug: '<path d="M12 20v-9M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4zM14.12 3.88 16 2M8 2l1.88 1.88M9 7.13v-1a3 3 0 0 1 6 0v1M6 13H2M22 13h-4M3 21c0-2.1 1.7-3.9 3.8-4M20.97 5c0 2.1-1.6 3.8-3.5 4M3 5c0 2.1 1.6 3.8 3.5 4M21 21c0-2.1-1.7-3.9-3.8-4"/>',
+  rpanel: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/>',
+  more: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+  artifacts: '<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M4 16a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2h10a1 1 0 0 1 1 1"/>',
+  branch: '<path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
+  remote: '<path d="M4.04 4.69a.5.5 0 0 1 .65-.65l16 6.5a.5.5 0 0 1-.06.95l-6.13 1.58a2 2 0 0 0-1.43 1.43l-1.58 6.13a.5.5 0 0 1-.95.06z"/>',
+  chevL: '<path d="m15 18-6-6 6-6"/>',
 };
 const VERBS = ['Thinking', 'Pondering', 'Cogitating', 'Clauding', 'Musing', 'Brewing', 'Percolating', 'Ruminating', 'Noodling', 'Mulling', 'Synthesizing', 'Reticulating'];
 const pickVerb = () => VERBS[Math.floor(Math.random() * VERBS.length)];
@@ -70,7 +76,7 @@ const spark = (live = false) => `<svg class="spark${live ? ' live' : ''}" viewBo
 const L10N = {
   en: {
     newChat: 'New chat', chats: 'Chats', projects: 'Projects', artifacts: 'Artifacts', code: 'Code', recents: 'Recents', share: 'Share',
-    phNew: 'Describe a task or ask a question', phReply: 'Reply to Claude...', home: n => `What’s up next, ${n}?`,
+    home: n => `What’s up next, ${n}?`,
     stTabs: ['Overview', 'Models'], stRanges: ['All', '30d', '7d'],
     stLabels: ['Sessions', 'Messages', 'Total tokens', 'Active days', 'Peak hour', 'Favorite model'],
     moby: n => `You've used ~${n}× more tokens than Moby-Dick.`, disclaimer: 'Claude can make mistakes. Please double-check responses.',
@@ -83,17 +89,22 @@ const L10N = {
     compacting: 'Compacting our conversation so we can keep chatting…', compacted: 'Conversation compacted',
     web: 'Searched the web', edited: 'Edited', todos: 'To-dos', running: 'Running…', read: 'Read', fetched: 'Fetched',
     plans: { max: 'Max', pro: 'Pro', team: 'Team', free: 'Free' },
-    effort: 'Effort', faster: 'Faster', smarter: 'Smarter', recommended: 'Recommended',
-    efforts: { low: 'Low', medium: 'Medium', high: 'High', xhigh: 'Extra high', max: 'Max', ultracode: 'Ultracode' },
-    maxWarn: 'Claude thinks longer with Max effort and can consume 3.5× or more usage than Medium.',
-    fastMode: 'Fast mode', enableFast: 'Enable fast mode',
-    search: 'Search', newSession: 'New', customize: 'Customize', moreNav: 'More', noFolder: 'No folder',
+    effort: 'Effort', recommended: 'Recommended',
+    efforts: { low: 'Low', medium: 'Medium', high: 'High', xhigh: 'Extra', max: 'Max', ultracode: 'Ultracode' },
+    effortHelp: 'Higher effort means more thorough responses, but takes longer and uses your limits faster.',
+    maxUsage: '3.5× or more usage',
+    fastMode: 'Fast mode', enableFast: 'Enable fast mode', needCredits: 'Requires usage credits', buyCredits: 'Buy credits',
+    search: 'Search', newSession: 'New', customize: 'Customize', routines: 'Routines', noFolder: 'No folder',
     searched: 'Searched the web for', ran: 'Ran', thoughtFor: s => `Thought for ${s}s`,
     worked: (d, t) => `Worked for ${d} · ${t} tokens`,
+    phIdle: 'Type / for commands', phBusy: 'Enter to send, Ctrl+Enter to queue for later',
+    editing: 'Editing', needsInput: 'Needs your input', skip: 'Skip', next: 'Next', submit: 'Submit', other: 'Other', of: (i, n) => `${i} of ${n}`,
+    environment: 'Environment', thisComputer: 'This computer', save: 'Save', remote: 'Remote Control',
+    context: 'Context', connectors: 'Connectors', connected: n => `${n} connected`, outputs: 'Outputs',
   },
   es: {
     newChat: 'Nuevo chat', chats: 'Chats', projects: 'Proyectos', artifacts: 'Artefactos', code: 'Código', recents: 'Recientes', share: 'Compartir',
-    phNew: 'Describe una tarea o haz una pregunta', phReply: 'Responder a Claude...', home: n => `¿Qué sigue, ${n}?`,
+    home: n => `¿Qué sigue, ${n}?`,
     stTabs: ['Resumen', 'Modelos'], stRanges: ['Todo', '30d', '7d'],
     stLabels: ['Sesiones', 'Mensajes', 'Tokens totales', 'Días activos', 'Hora pico', 'Modelo favorito'],
     moby: n => `Has usado ~${n}× más tokens que Moby-Dick.`, disclaimer: 'Claude puede cometer errores. Verifica las respuestas.',
@@ -106,13 +117,18 @@ const L10N = {
     compacting: 'Compactando nuestra conversación para que podamos seguir hablando…', compacted: 'Conversación compactada',
     web: 'Buscó en la web', edited: 'Editó', todos: 'Tareas', running: 'Ejecutando…', read: 'Leyó', fetched: 'Consultó',
     plans: { max: 'Max', pro: 'Pro', team: 'Team', free: 'Gratis' },
-    effort: 'Esfuerzo', faster: 'Más rápido', smarter: 'Más inteligente', recommended: 'Recomendado',
-    efforts: { low: 'Bajo', medium: 'Medio', high: 'Alto', xhigh: 'Muy alto', max: 'Máximo', ultracode: 'Ultracode' },
-    maxWarn: 'Claude piensa más con el esfuerzo Máximo y puede consumir 3.5× o más uso que Medio.',
-    fastMode: 'Modo rápido', enableFast: 'Activar modo rápido',
-    search: 'Buscar', newSession: 'Nuevo', customize: 'Personalizar', moreNav: 'Más', noFolder: 'Sin carpeta',
+    effort: 'Esfuerzo', recommended: 'Recomendado',
+    efforts: { low: 'Bajo', medium: 'Medio', high: 'Alto', xhigh: 'Extra', max: 'Máximo', ultracode: 'Ultracode' },
+    effortHelp: 'Más esfuerzo da respuestas más completas, pero tarda más y gasta tus límites más rápido.',
+    maxUsage: '3.5× o más uso',
+    fastMode: 'Modo rápido', enableFast: 'Activar modo rápido', needCredits: 'Requiere créditos de uso', buyCredits: 'Comprar créditos',
+    search: 'Buscar', newSession: 'Nuevo', customize: 'Personalizar', routines: 'Rutinas', noFolder: 'Sin carpeta',
     searched: 'Buscó en la web', ran: 'Ejecutó', thoughtFor: s => `Pensó durante ${s}s`,
     worked: (d, t) => `Trabajó ${d} · ${t} tokens`,
+    phIdle: 'Escribe / para ver comandos', phBusy: 'Enter para enviar, Ctrl+Enter para dejarlo en cola',
+    editing: 'Editando', needsInput: 'Necesita tu respuesta', skip: 'Omitir', next: 'Siguiente', submit: 'Enviar', other: 'Otra', of: (i, n) => `${i} de ${n}`,
+    environment: 'Entorno', thisComputer: 'Este equipo', save: 'Guardar', remote: 'Control remoto',
+    context: 'Contexto', connectors: 'Conectores', connected: n => `${n} conectados`, outputs: 'Resultados',
   },
 };
 const T = () => L10N[S.lang] || L10N.en;
@@ -123,13 +139,15 @@ const DEFAULT_MODELS = {
   en: ['opus | Opus 5.5', 'fable | Fable 5.1', 'sonnet | Sonnet 5.5', 'haiku | Haiku 5.5 | Default'].join('\n'),
   es: ['opus | Opus 5.5', 'fable | Fable 5.1', 'sonnet | Sonnet 5.5', 'haiku | Haiku 5.5 | Predeterminado'].join('\n'),
 };
-// Groups: one line per group; its sessions below with "- " ("* " = filled dot). A group without sessions is shown collapsed.
+// Groups: one line per group ("Name *" = blue dot); its sessions below with "- " ("* " = unread). A group without sessions
+// is shown collapsed. An indented session hangs from the one above; "| branch" or "| branch 2" adds the branch icon.
 const DEFAULT_RECENTS = [
+  'Tools', '- Release checklist', '- Error diagnostics',
   'Website', 'Mobile app', 'Docs',
-  'Backend', '* Fix login redirect loop', '- Add rate limiting to API', '- Migrate database to Postgres 17', '- Write integration tests',
-  '- Refactor payment service', '- Investigate slow queries',
-  'Design system',
-  'Experiments', '* Prototype voice commands', '- Benchmark image pipeline', '- Try new chart library',
+  'Backend', '- Fix login redirect loop | branch', '  * Investigate slow queries', '- Add rate limiting to API',
+  '- Migrate database to Postgres 17 | branch 2',
+  'Design system *',
+  'Experiments', '- Prototype voice commands', '- Benchmark image pipeline',
   'Research', 'Archive',
   'Ungrouped',
 ].join('\n');
@@ -167,9 +185,18 @@ function parseGroups(txt) {
   for (const raw of String(txt || '').split('\n')) {
     const l = raw.trim();
     if (!l) continue;
-    const m = raw.match(/^\s*([-*])\s+(.*)$/);
-    if (m && groups.length) groups[groups.length - 1].items.push({ t: m[2].trim(), f: m[1] === '*' });
-    else groups.push({ name: l, items: [] });
+    const m = raw.match(/^(\s*)([-*])\s+(.*)$/);
+    if (m && groups.length) {
+      const g = groups[groups.length - 1];
+      const [title, extra = ''] = m[3].split('|').map(x => x.trim());
+      const b = extra.match(/^branch\s*(\d*)$/i);
+      const it = { t: title, unread: m[2] === '*', branch: b ? (b[1] || true) : null, kids: [] };
+      const parent = g.items[g.items.length - 1];
+      if (m[1].length && parent) parent.kids.push(it); else g.items.push(it);
+    } else {
+      const dot = / \*$/.test(l);
+      groups.push({ name: dot ? l.slice(0, -2).trim() : l, dot, items: [] });
+    }
   }
   return groups;
 }
@@ -188,11 +215,12 @@ function fmtStatsHeat(days, seed) {
 }
 const DEF = {
   mode: 'magic', theme: 'light', lang: 'en', frame: 'none', zoom: 1, serif: 'Segoe UI Variable Text', sans: 'Segoe UI Variable Text',
-  sidebar: true, chips: false, fakeCursor: true, mouseSpeed: 1,
+  sidebar: true, rpanel: true, chips: false, fakeCursor: true, mouseSpeed: 1,
   speed: 1, typeCps: 14, reveal: 'stream', streamCps: 170, charsPerKey: 1, startDelay: 1,
   hideMouse: true, toasts: true, recents: DEFAULT_RECENTS, models: '',
 };
-const LS_S = 'ccsim.desktop.settings.v3', LS_SCRIPT = 'ccsim.script.v1';
+// Own settings key: the 2.31226.1 replica (desktop-2.31226.1.html) keeps its own. The script is shared by every page.
+const LS_S = 'ccsim.desktop-3.6556.settings.v1', LS_SCRIPT = 'ccsim.script.v1';
 const lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
 let S = Object.assign({}, DEF, (() => { try { return JSON.parse(lsGet(LS_S) || '{}'); } catch { return {}; } })());
@@ -201,17 +229,18 @@ const EXAMPLE = (window.EXAMPLE_SCRIPT || '').replace(/^\s*\n/, ''); // js/examp
 const storedScript = lsGet(LS_SCRIPT);
 const firstRun = lsGet(LS_S) == null;
 // An old built-in example saved in the browser is replaced by the current one; a script you wrote is kept.
-const isOldExample = t => (/GUION DE EJEMPLO/.test(t || '') && /agujeros negros/i.test(t || '')) || (/CLAUDE SIMULATOR · EXAMPLE SCRIPT/.test(t || '') && /^(@user: Alex|user: ultrathink .*|\[title Physics rescue attempt\])$/m.test(t || ''));
+// Built-in examples older than 2026-10-23 have no "question:" block.
+const isOldExample = t => (/GUION DE EJEMPLO/.test(t || '') && /agujeros negros/i.test(t || '')) || (/CLAUDE SIMULATOR · EXAMPLE SCRIPT/.test(t || '') && !/^question:/m.test(t || ''));
 let SCRIPT = storedScript && storedScript.trim() && !isOldExample(storedScript) ? storedScript : EXAMPLE;
 if (storedScript && isOldExample(storedScript)) lsSet(LS_SCRIPT, EXAMPLE);
 // Old default sidebar → the new generic one.
 if (/Interfaz Claude simulada para videos|MCP Obsidian/.test(S.recents || '')) { S.recents = DEFAULT_RECENTS; saveS(); }
 
-// "Effort" slider levels (left to right). "Recommended" = medium.
+// "Effort" submenu levels, top to bottom. "Recommended" = medium.
 const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max', 'ultracode'];
 const REC_EFFORT = 1;
-// Position (%) of each level: at Low and Ultracode the thumb sits flush with the ends of the bar.
-const EPOS = i => 4.07 + i * (91.86 / 5);
+// "More models" submenu (as listed by the app on 2026-10-23).
+const MORE_MODELS = ['Haiku 4.5', 'Sonnet 5', 'Opus 5', 'Fable 5', 'Opus 4.8', 'Opus 4.7', 'Opus 4.6', 'Sonnet 4.6'];
 const EFFORT_DELAY = { low: 1300, medium: 2400, high: 3600, xhigh: 4800, max: 6000, ultracode: 8000 };
 const EFFORT_ALIAS = { bajo:'low', baja:'low', low:'low', minimo:'low', medio:'medium', media:'medium', medium:'medium', normal:'medium', alto:'high', alta:'high', high:'high', xhigh:'xhigh', extra:'xhigh', muyalto:'xhigh', altisimo:'xhigh', max:'max', maximo:'max', maxima:'max', maximum:'max', ultracode:'ultracode', ultra:'ultracode' };
 const normEff = q => norm(q).replace(/muy\s+alt[oa]/g, 'muyalto').replace(/extra\s+high/g, 'xhigh');
@@ -255,6 +284,7 @@ const BLOCKS = {
   razonamiento: 'reasoning', pensamiento: 'reasoning', thinking: 'reasoning', reasoning: 'reasoning',
   tool: 'tool', herramienta: 'tool', 'tool-error': 'toolerr', 'herramienta-error': 'toolerr', toolerror: 'toolerr',
   editar: 'edit', edit: 'edit', tareas: 'todos', todos: 'todos', todo: 'todos', permiso: 'perm', permission: 'perm',
+  pregunta: 'question', question: 'question', confirmar: 'confirm', confirm: 'confirm',
 };
 const MODE_ALIAS = { normal:'normal', default:'normal', plan:'plan', edits:'edits', edit:'edits', aceptar:'edits', accept:'edits', bypass:'bypass', yolo:'bypass' };
 const DIRS = {
@@ -268,7 +298,7 @@ const DIRS = {
   interrumpir: () => ({ t: 'interrupt' }),
   limpiar: () => ({ t: 'clear' }),
   compactar: () => ({ t: 'compact' }),
-  elegir: a => ({ t: 'choose', n: Math.max(1, Math.min(3, num(a) || 1)) }),
+  elegir: a => ({ t: 'choose', n: Math.max(1, Math.min(9, num(a) || 1)) }),
   detalle: () => ({ t: 'detail' }),
   tokens: a => ({ t: 'tokens', n: parseTokens(a) }),
 };
@@ -281,7 +311,9 @@ const DIR_ALIAS = {
   limpiar:'limpiar', clear:'limpiar', compactar:'compactar', compact:'compactar',
   elegir:'elegir', opcion:'elegir', choose:'elegir', detalle:'detalle', 'ctrl+o':'detalle', detail:'detalle', tokens:'tokens', token:'tokens', gasto:'tokens', consumo:'tokens',
 };
-const TURN = new Set(['claude','reasoning','tool','toolerr','edit','todos','perm','error','interrupt','think']);
+const TURN = new Set(['claude','reasoning','tool','toolerr','edit','todos','perm','question','confirm','error','interrupt','think']);
+// Steps that wait for an answer: [choose N] picks it.
+const ASKS = new Set(['perm', 'question', 'confirm']);
 const INTURN = new Set(['pause','mode','context','title','info','detail','tokens']);
 // "3.5M", "3,5 millones", "800k", "1200000" → number of tokens
 function parseTokens(a) {
@@ -291,11 +323,6 @@ function parseTokens(a) {
   const v = parseFloat(m[1].replace(',', '.'));
   const mult = { k: 1e3, mil: 1e3, m: 1e6, mm: 1e6, millones: 1e6, millon: 1e6, b: 1e9, billones: 1e9 }[m[2]] || 1;
   return Math.round(v * mult);
-}
-// Finds a [tokens] directive inside the turn starting at pc (including loose directives at the end of the turn).
-function turnTokens(steps, pc) {
-  for (let j = pc; j < steps.length && (TURN.has(steps[j].t) || INTURN.has(steps[j].t)); j++) if (steps[j].t === 'tokens') return steps[j].n;
-  return 0;
 }
 function trimBlank(arr) { let a = 0, b = arr.length; while (a < b && !arr[a].trim()) a++; while (b > a && !arr[b - 1].trim()) b--; return arr.slice(a, b); }
 function parseCall(hd) { hd = String(hd || '').trim(); const m = hd.match(/^([^(]+?)\s*\(([\s\S]*)\)\s*$/); return m ? { name: m[1].trim(), args: m[2] } : { name: hd || 'Tool', args: null }; }
@@ -344,6 +371,15 @@ function finalize(c) {
     }
     case 'edit': return { t: 'edit', file: c.head.trim() || 'file.txt', diff: parseDiff(trimBlank(c.lines)), line: c.line };
     case 'todos': return { t: 'todos', items: all.filter(l => l.trim()).map(parseTodo), line: c.line };
+    // "- Label | description" lines are the options; any other line is extra text.
+    case 'question': case 'confirm': {
+      const options = [], text = [];
+      for (const l of c.lines) {
+        const m = l.match(/^\s*[-*]\s+(.*)$/);
+        if (m) { const [label, desc = ''] = m[1].split('|').map(x => x.trim()); options.push({ label, desc }); } else text.push(l);
+      }
+      return { t: c.t, q: c.head.trim(), text: trimBlank(text).join('\n'), options, choice: 1, line: c.line };
+    }
   }
   return null;
 }
@@ -372,7 +408,7 @@ function compile(src) {
   // A session is named once (@title, a [title] in its first turn, or its first message) and keeps that name; /clear starts a new one.
   let titled = !!(hdr.titulo || hdr.title), answered = false;
   for (const s of steps) {
-    if (s.t === 'choose') { const p = [...out].reverse().find(x => x.t === 'perm'); if (p) p.choice = s.n; else warn.push(`Line ${s.line}: [choose] without a "permission:" before it`); continue; }
+    if (s.t === 'choose') { const p = [...out].reverse().find(x => ASKS.has(x.t)); if (p) p.choice = s.n; else warn.push(`Line ${s.line}: [choose] without a "permission:", "question:" or "confirm:" before it`); continue; }
     if (s.t === 'clear' || (s.t === 'user' && /^\/clear\b/i.test(s.text))) { titled = answered = false; }
     else if (s.t === 'user' && answered) titled = true;
     else if (s.t === 'claude') answered = true;
@@ -533,9 +569,11 @@ function wait(ms, interruptible = false) {
 /* ════════════════════ State ════════════════════ */
 const st = {
   steps: [], warn: [], hdr: {}, input: '', model: null, effort: 'medium', thinking: false, fast: false,
-  title: '', titled: false, empty: true, generating: false, menu: null, effortPop: null, micro: null, permWaiter: null,
+  title: '', titled: false, empty: true, generating: false, menu: null, micro: null, permWaiter: null,
   magic: null, free: null, paused: false, detailed: false, waitingStart: false, startResolve: null,
   playing: false, finished: false, recents: [], cur: -1,
+  // Session panel: files under "Outputs", context left set by the script (null = estimated) and tokens spent so far.
+  outputs: [], ctxLeft: null, sessionTok: 0,
 };
 const elThread = $('#thread'), elScroll = $('#scroll'), elMain = $('#main');
 const scrollBottom = () => { elScroll.scrollTop = elScroll.scrollHeight; };
@@ -570,8 +608,6 @@ function renderStatic() {
   $('#avatar').innerHTML = spark();
   $('#uname').textContent = H.user || 'User';
   $('#uplan').textContent = ' · ' + planLabel(H.plan || 'Claude Max');
-  $('#folderBadge').textContent = H.folder || T().noFolder;
-  const hr = new Date().getHours();
   $('#greet').innerHTML = '';
   $('#hgreet').innerHTML = spark() + `<h1>${esc(H.greeting || T().home(H.user || 'there'))}</h1>`;
   const L = T(), SS = H.stats;
@@ -579,70 +615,126 @@ function renderStatic() {
     + `<div class="st-grid">${[SS.sessions, SS.messages, SS.tokens, SS.days, SS.peak, SS.fav].map((v, i) => `<div class="st-tile"><div class="k">${esc(L.stLabels[i])}</div><div class="v${i === 5 ? ' n' : ''}">${esc(v)}</div></div>`).join('')}</div>`
     + `<div class="heat">${fmtStatsHeat(num(SS.days) || 15, 11)}</div>`
     + `<div class="st-note">${esc(L.moby(SS.moby))}</div>`;
-  $('#ctxFolder').textContent = H.folder || T().noFolder;
 
   renderFrame();
   renderRecents();
   renderTitle();
   renderComposer();
+  renderRPanel();
 }
 function renderFrame() {
   $('#stage').className = S.frame === 'none' ? '' : 'framed f-' + S.frame;
 }
-// Sidebar: groups (collapsed, or expanded with their sessions). The script session lives in "Ungrouped".
+// Sidebar: groups (collapsed ▸, or expanded ▾ with their sessions, nested ones hanging from a tree line).
+// The script session lives in "Ungrouped".
 function renderRecents(fresh = false) {
-  const gs = st.groups, last = gs.length - 1;
-  $('#groups').innerHTML = gs.map((g, gi) => {
-    const open = g.items.length > 0, isUng = /^(ungrouped|sin grupo)$/i.test(g.name);
-    const acts = isUng ? '' : `<span class="ga"><span>${ic('plus')}</span>${gi === 0 ? `<span>${ic('sliders')}</span>` : ''}</span>`;
-    const head = `<div class="grp${open ? ' open' : ''}"><span class="gn">${esc(g.name)}</span><span class="gc">${ic('chevR')}</span><span class="sp"></span>${acts}</div>`;
-    return head + g.items.map(it => `<div class="ses${it.cur ? ' cur' : ''}${it.cur && fresh ? ' fresh' : ''}"><span class="dot${it.f || it.cur ? ' f' : ''}"></span><span class="tt">${esc(it.t)}</span></div>`).join('');
+  const row = (it, kid) => `<div class="ses${kid ? ' kid' : ''}${it.cur ? ' cur' : ''}${it.cur && fresh ? ' fresh' : ''}">`
+    + (kid ? '<span class="tree"></span>' : '') + `<span class="tt">${esc(it.t)}</span>`
+    + (it.kids && it.kids.length ? `<span class="sc">${ic('chev')}</span>` : '') + '<span class="sp"></span>'
+    + (it.branch ? `<span class="br">${ic('branch')}${it.branch !== true ? `<span>${esc(it.branch)}</span>` : ''}</span>` : '')
+    + (it.unread ? '<span class="ud"></span>' : '') + '</div>';
+  $('#groups').innerHTML = st.groups.map(g => {
+    const open = g.items.length > 0;
+    return `<div class="grp${open ? ' open' : ''}"><span class="gn">${esc(g.name)}</span><span class="gc">${ic(open ? 'chev' : 'chevR')}</span>${g.dot ? '<span class="ud"></span>' : ''}</div>`
+      + g.items.map(it => row(it, false) + (it.kids || []).map(k => row(k, true)).join('')).join('');
   }).join('');
   $('.nav-item.new').classList.toggle('on', st.empty);
-}function renderTitle() {
+}
+function renderTitle() {
   $('#titleText').textContent = st.titled ? st.title : T().newSession;
   document.title = st.titled ? `${st.title} - Claude` : 'Claude';
 }
 function renderComposer() {
   $('#cText').textContent = st.input;
-  $('#cPh').textContent = st.input ? '' : (st.empty ? T().phNew : T().phReply);
+  $('#cPh').textContent = st.input ? '' : (st.generating ? T().phBusy : T().phIdle);
   $('#modelName').textContent = st.model ? st.model.name : '';
-  $('#effortName').textContent = T().efforts[st.effort] || st.effort;
-  $('#effortWarn').innerHTML = st.effort === 'max' ? ic('warn') : '';
+  const en = $('#effortName');
+  en.textContent = T().efforts[st.effort] || st.effort;
+  en.classList.toggle('ultra', st.effort === 'ultracode');
   const sb = $('#sendBtn');
   sb.classList.toggle('stop', st.generating);
-  sb.innerHTML = ic(st.generating ? 'stop' : 'enter');
+  sb.innerHTML = st.generating ? '<span class="sq"></span>' : ic('enter');
   $('#modelBtn').classList.toggle('is-open', !!st.menu);
-  $('#effortBtn').classList.toggle('is-open', !!st.effortPop);
   renderBusy();
 }
+// Ring next to the model: gray at rest, a blue spinner while Claude works.
 function renderBusy() {
-  const b = $('#busy');
-  if (!st.generating) { b.innerHTML = '<span class="ring idle"></span>'; return; }
-  if (!b.querySelector('.ring:not(.idle)')) b.innerHTML = '<span class="bt"></span><span class="ring"></span>';
-  b.querySelector('.bt').textContent = st.tokTarget ? `↓ ${fmtTok(st.tok)} tokens` : '';
+  const b = $('#busy'), want = st.generating ? 'ring' : 'ring idle';
+  if (!b.firstChild || b.firstChild.className !== want) b.innerHTML = `<span class="${want}"></span>`;
 }
+/* Session panel (right): Environment, Context, Connectors and Outputs cards */
+const ctxUsed = () => st.ctxLeft != null
+  ? Math.max(0, Math.min(100, Math.round(100 - st.ctxLeft)))
+  : Math.min(95, Math.round(2 + 93 * (1 - Math.exp(-(st.sessionTok + (st.generating ? st.tok : 0)) / 600000))));
+const ctxRing = pct => `<svg class="cring" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><circle class="v" cx="10" cy="10" r="7" stroke-dasharray="${(43.98 * pct / 100).toFixed(2)} 43.98" transform="rotate(-90 10 10)"/></svg>`;
+function renderRPanel() {
+  const p = $('#rpanel'), L = T(), H = st.hdr, used = ctxUsed();
+  $('#rpToggle').classList.toggle('on', !!S.rpanel);
+  p.hidden = !S.rpanel;
+  if (!S.rpanel) return;
+  const head = (name, open, right = '') => `<div class="rp-h"><span>${esc(name)}</span>${ic(open ? 'chev' : 'chevR', 'rc')}<span class="sp"></span>${right}</div>`;
+  const rowH = (icon, text, right = '') => `<div class="rp-row">${ic(icon)}<span class="rt">${text}</span>${right}</div>`;
+  p.innerHTML = `<div class="rp-card">${head(L.environment, true)}`
+      + rowH('laptop', esc(L.thisComputer), `<span class="rv">${esc(L.save)}</span>`)
+      + rowH('folder', esc(H.folder || L.noFolder) + (H.parent ? ` · ${esc(H.parent)}` : ''))
+      + rowH('branch', esc(H.branch))
+      + rowH('remote', esc(L.remote), '<span class="sw"><i></i></span>') + '</div>'
+    + `<div class="rp-card one">${head(L.context, false, `<span class="rv" id="rpCtx">${used}%</span><span id="rpRing">${ctxRing(used)}</span>`)}</div>`
+    + `<div class="rp-card one">${head(L.connectors, false, `<span class="rv">${esc(L.connected(H.connectors))}</span>`)}</div>`
+    + (st.outputs.length ? `<div class="rp-card">${head(L.outputs, true)}${st.outputs.map(f => rowH('file', esc(f))).join('')}</div>` : '');
+}
+// Live update of the context percentage while tokens climb (without redrawing the whole panel).
+function tickContext() {
+  const v = $('#rpCtx');
+  if (!v) return;
+  const used = ctxUsed();
+  if (v.textContent !== used + '%') { v.textContent = used + '%'; $('#rpRing').innerHTML = ctxRing(used); }
+}
+$('#rpToggle').addEventListener('click', () => { S.rpanel = !S.rpanel; saveS(); renderRPanel(); });
 function setEmpty(v) { st.empty = v; elMain.classList.toggle('empty', v); $('#win').classList.toggle('empty', v); $('.nav-item.new').classList.toggle('on', v); renderTitle(); renderComposer(); }
 function setInput(t) { st.input = t; renderComposer(); }
 
-/* Model menu */
+/* Model menu: models, the "Effort" and "More models" submenus, and fast mode */
 function renderMenu() {
   const m = $('#menu');
-  if (!st.menu) { m.hidden = true; renderComposer(); return; }
-  const L = T();
+  if (!st.menu) { m.hidden = true; renderSub(); renderComposer(); return; }
+  const L = T(), sub = st.menu.sub;
   m.innerHTML = MODELS.map((x, i) => `<div class="mi" data-i="${i}"><div class="mt"><span class="mn">${esc(x.name)}</span>${x.badge ? `<span class="badge">${esc(x.badge)}</span>` : ''}</div><div class="mc">${x === st.model ? ic('check') : `<span class="num">${i + 1}</span>`}</div></div>`).join('')
-    + `<div class="mi more"><div class="mt"><span class="mn">${esc(L.more)}</span></div><div class="mc" style="color:var(--t3)">${ic('chevR')}</div></div>`
+    + `<div class="msep"></div>`
+    + `<div class="mi sub${sub === 'effort' ? ' act' : ''}" data-sub="effort"><div class="mt"><span class="mn">${esc(L.effort)}</span></div><span class="mv">${esc(L.efforts[st.effort])}</span><div class="mc gray">${ic('chevR')}</div></div>`
+    + `<div class="msep"></div>`
+    + `<div class="mi sub${sub === 'more' ? ' act' : ''}" data-sub="more"><div class="mt"><span class="mn">${esc(L.more)}</span></div><div class="mc gray">${ic('chevR')}</div></div>`
     + `<div class="msep"></div><div class="msec">${esc(L.fastMode)}</div>`
-    + `<div class="mi" data-act="fast"><div class="mt"><span class="mn">${esc(L.enableFast)}</span></div><div class="sw${st.fast ? ' on' : ''}"><i></i></div></div>`;
+    + `<div class="mi fast" data-act="fast"><div class="mt col"><span class="mn">${esc(L.enableFast)}</span><span class="ms">${esc(L.needCredits)}</span></div>${st.fast ? '<div class="sw on"><i></i></div>' : `<span class="buy">${esc(L.buyCredits)}</span>`}</div>`;
   m.hidden = false;
   const r = $('#modelBtn').getBoundingClientRect();
   const mh = m.offsetHeight, mw = m.offsetWidth;
   m.style.left = Math.max(8, Math.min(innerWidth - mw - 8, r.right - mw)) + 'px';
   m.style.top = (r.bottom + 8 + mh < innerHeight - 8 ? r.bottom + 8 : Math.max(8, r.top - 8 - mh)) + 'px';
+  renderSub();
   renderComposer();
   refreshHover();
 }
-function openMenu() { closeEffort(); st.menu = {}; renderMenu(); }
+function renderSub() {
+  const s = $('#submenu'), which = st.menu && st.menu.sub;
+  if (!which) { s.hidden = true; return; }
+  const L = T();
+  s.className = which;
+  s.innerHTML = which === 'effort'
+    ? `<div class="sh">${esc(L.effortHelp)}</div>` + EFFORTS.map(e => `<div class="si${e === 'ultracode' ? ' ultra' : ''}" data-e="${e}"><span class="sn">${esc(L.efforts[e])}</span>`
+      + (e === EFFORTS[REC_EFFORT] ? `<span class="badge">${esc(L.recommended)}</span>` : '')
+      + (e === 'max' ? `<span class="wbadge">${ic('warn')}${esc(L.maxUsage)}</span>` : '')
+      + `<span class="sp"></span><span class="mc">${e === st.effort ? ic('check') : ''}</span></div>`).join('')
+    : MORE_MODELS.map((n, i) => `<div class="si" data-m="${i}"><span class="sn">${esc(n)}</span><span class="sp"></span><span class="mc">${st.model && st.model.name === n ? ic('check') : ''}</span></div>`).join('');
+  s.hidden = false;
+  const row = $(`#menu [data-sub="${which}"]`).getBoundingClientRect(), mr = $('#menu').getBoundingClientRect();
+  const sh = s.offsetHeight, sw = s.offsetWidth;
+  const left = mr.right + 4 + sw < innerWidth - 8 ? mr.right + 4 : Math.max(8, mr.left - sw - 4);
+  // It opens upwards: its bottom lines up with the row that opened it, like in the app.
+  s.style.left = left + 'px';
+  s.style.top = Math.max(8, Math.min(innerHeight - sh - 8, row.bottom + 6 - sh)) + 'px';
+}
+function openMenu() { st.menu = { sub: null }; renderMenu(); }
 function closeMenu() {
   if (!st.menu) return;
   st.menu = null;
@@ -650,10 +742,22 @@ function closeMenu() {
   // Only in Free mode does a real mouse selection finish the script step.
   if (st.micro && st.micro.manual && st.micro.kind === 'model') finishMicro(st.micro);
 }
+function openSub(which) { if (!st.menu || st.menu.sub === which) return; st.menu.sub = which; renderMenu(); }
 function selectModel(i) {
   if (MODELS[i]) st.model = MODELS[i];
   closeMenu();
 }
+function selectMoreModel(i) {
+  const n = MORE_MODELS[i];
+  st.model = MODELS.find(m => m.name === n) || { alias: norm(n), name: n, badge: '' };
+  closeMenu();
+}
+function setEffort(e) {
+  st.effort = e;
+  st.thinking = EFFORTS.indexOf(e) >= 2;
+  renderComposer();
+}
+function chooseEffort(e) { setEffort(e); closeMenu(); }
 function toggleFast() { st.fast = !st.fast; renderMenu(); }
 $('#modelBtn').addEventListener('click', e => { e.stopPropagation(); if (st.menu) closeMenu(); else openMenu(); });
 $('#menu').addEventListener('click', e => {
@@ -661,124 +765,37 @@ $('#menu').addEventListener('click', e => {
   const it = e.target.closest('.mi');
   if (!it) return;
   if (it.dataset.act === 'fast') toggleFast();
+  else if (it.dataset.sub) openSub(it.dataset.sub);
   else if (it.dataset.i != null) selectModel(+it.dataset.i);
 });
-
-/* Effort picker (slider) */
-function setEffort(e) {
-  st.effort = e;
-  st.thinking = EFFORTS.indexOf(e) >= 2;
-  renderComposer();
-}
-function openEffort() {
-  if (st.menu) closeMenu();
-  st.effortPop = { dragPct: null };
-  const L = T();
-  const p = $('#effortPop');
-  p.innerHTML = `<div class="ep-h"><span class="ep-t">${esc(L.effort)}</span><span class="ep-v" id="epV"></span><span class="ep-q">${HELP_ICON}</span></div>`
-    + `<div class="ep-ends"><span>${esc(L.faster)}</span><span>${esc(L.smarter)}</span></div>`
-    + `<div class="ep-track" id="epTrack"><div class="ep-fill" id="epFill"></div><canvas id="epCanvas"></canvas>${EFFORTS.map((_, i) => i === REC_EFFORT ? `<i class="ep-tick" style="left:${EPOS(i)}%"></i>` : `<i class="ep-dot" style="left:${EPOS(i)}%"></i>`).join('')}<div class="ep-thumb" id="epThumb"></div></div>`
-    + `<div class="ep-rec"><span style="left:${EPOS(REC_EFFORT)}%">${esc(L.recommended)}</span></div>`
-    + `<div class="ep-warn" id="epWarn">${ic('warn')}<span>${esc(L.maxWarn)}</span></div>`;
-  p.hidden = false;
-  syncEffort();
-  renderComposer();
-}
-function syncEffort() {
-  if (!st.effortPop) return;
-  const ultra = st.effort === 'ultracode';
-  const v = $('#epV');
-  v.textContent = T().efforts[st.effort];
-  v.classList.toggle('ultra', ultra);
-  $('#epTrack').classList.toggle('ultra', ultra);
-  const pct = st.effortPop.dragPct != null ? st.effortPop.dragPct : EPOS(EFFORTS.indexOf(st.effort));
-  $('#epThumb').style.left = pct + '%';
-  $('#epFill').style.width = pct + '%';
-  $('#epWarn').hidden = st.effort !== 'max';
-  if (ultra) startUltra(); else stopUltra();
-  // Anchored at the bottom: the "Max" warning makes the popover grow upwards, like the app.
-  const p = $('#effortPop'), r = $('#effortBtn').getBoundingClientRect();
-  p.style.left = Math.max(8, Math.min(innerWidth - p.offsetWidth - 8, r.right - p.offsetWidth + 6)) + 'px';
-  p.style.top = 'auto';
-  p.style.bottom = (innerHeight - r.top + 8) + 'px';
-}
-function closeEffort() {
-  if (!st.effortPop) return;
-  st.effortPop = null;
-  $('#effortPop').hidden = true;
-  stopUltra();
-  renderComposer();
-}
-function effortAtX(cx) {
-  const r = $('#epTrack').getBoundingClientRect();
-  const pct = Math.max(EPOS(0), Math.min(EPOS(EFFORTS.length - 1), (cx - r.left) / r.width * 100));
-  let best = 0;
-  EFFORTS.forEach((_, i) => { if (Math.abs(EPOS(i) - pct) < Math.abs(EPOS(best) - pct)) best = i; });
-  return { pct, idx: best };
-}
-function dragEffortTo(cx) {
-  if (!st.effortPop) return;
-  const { pct, idx } = effortAtX(cx);
-  st.effortPop.dragPct = EPOS(idx); // the slider moves in steps, not continuously
-  if (EFFORTS[idx] !== st.effort) setEffort(EFFORTS[idx]);
-  syncEffort();
-}
-function endEffortDrag() { if (!st.effortPop) return; st.effortPop.dragPct = null; syncEffort(); }
-$('#effortBtn').addEventListener('click', e => { e.stopPropagation(); if (st.effortPop) closeEffort(); else openEffort(); });
-$('#effortPop').addEventListener('click', e => e.stopPropagation());
-$('#effortPop').addEventListener('pointerdown', e => {
-  if (!e.target.closest('#epTrack')) return;
-  e.preventDefault();
-  const sel = window.getSelection && window.getSelection(); if (sel) sel.removeAllRanges();
-  st.effortPop.realDrag = true;
-  dragEffortTo(e.clientX);
+// With the real mouse, hovering a row opens its submenu (or closes the open one).
+$('#menu').addEventListener('mouseover', e => {
+  const it = e.target.closest('.mi');
+  if (!it || !st.menu || $('#fakeCursor').classList.contains('on')) return;
+  const want = it.dataset.sub || null;
+  if (want !== st.menu.sub) { st.menu.sub = want; renderMenu(); }
 });
-document.addEventListener('pointermove', e => { if (st.effortPop && st.effortPop.realDrag) dragEffortTo(e.clientX); });
-document.addEventListener('pointerup', () => { if (st.effortPop && st.effortPop.realDrag) { st.effortPop.realDrag = false; endEffortDrag(); } });
-
-/* Ultracode animation: pixels drifting right to left, fading from purple to white */
-let ultraRAF = 0;
-const cellHash = (a, b) => { let x = Math.imul(a, 374761393) + Math.imul(b, 668265263) | 0; x = Math.imul(x ^ (x >>> 13), 1274126177); return ((x ^ (x >>> 16)) >>> 0) / 4294967295; };
-function drawUltra(ts) {
-  const c = $('#epCanvas');
-  if (!c || !c.offsetWidth) return;
-  const dpr = devicePixelRatio || 1, W = c.offsetWidth, H = c.offsetHeight;
-  if (c.width !== Math.round(W * dpr) || c.height !== Math.round(H * dpr)) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
-  const ctx = c.getContext('2d');
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, W, H);
-  const dark = document.documentElement.classList.contains('dark');
-  const cell = 2.5, step = 4;
-  const cols = Math.ceil(W / step), rows = Math.max(3, Math.floor((H - 4) / step));
-  const y0 = (H - rows * step + (step - cell)) / 2;
-  const off = Math.floor(ts / 85); // one column every 85 ms → the pixels move left
-  const P = [112, 76, 236], Wc = dark ? [70, 64, 92] : [255, 255, 255];
-  for (let col = 0; col < cols; col++) {
-    const ramp = Math.pow((col + 0.5) / cols, 1.15);
-    for (let r = 0; r < rows; r++) {
-      const n = cellHash(col + off, r * 7 + 3);
-      let v = ramp * 1.5 - (1 - n) * 0.58;
-      if (v <= 0.04) continue;
-      v = Math.min(1, v);
-      const flick = 0.8 + 0.2 * cellHash(col + off, r + 99);
-      const k = v * flick;
-      ctx.fillStyle = `rgba(${Math.round(Wc[0] + (P[0] - Wc[0]) * k)},${Math.round(Wc[1] + (P[1] - Wc[1]) * k)},${Math.round(Wc[2] + (P[2] - Wc[2]) * k)},${(0.45 + 0.55 * v).toFixed(3)})`;
-      ctx.fillRect(col * step, y0 + r * step, cell, cell);
-    }
-  }
-}
-function startUltra() { if (ultraRAF) return; const loop = ts => { drawUltra(ts); ultraRAF = requestAnimationFrame(loop); }; ultraRAF = requestAnimationFrame(loop); }
-function stopUltra() { if (ultraRAF) cancelAnimationFrame(ultraRAF); ultraRAF = 0; }
+$('#submenu').addEventListener('click', e => {
+  e.stopPropagation();
+  const it = e.target.closest('.si');
+  if (!it) return;
+  if (it.dataset.e) chooseEffort(it.dataset.e);
+  else if (it.dataset.m != null) selectMoreModel(+it.dataset.m);
+});
 
 document.addEventListener('click', e => {
-  if (st.menu && !e.target.closest('#menu')) closeMenu();
-  if (st.effortPop && !e.target.closest('#effortPop')) closeEffort();
+  if (st.menu && !e.target.closest('#menu, #submenu')) closeMenu();
 });
 document.addEventListener('click', e => {
   const th = e.target.closest('.th-head, .tl-head');
   if (th) th.parentElement.classList.toggle('open');
   const pb = e.target.closest('.pb');
   if (pb && st.permWaiter) choosePerm(+pb.dataset.c);
+  const A = st.askWaiter, ao = e.target.closest('.ask-o'), ab = e.target.closest('.abtn');
+  if (A && ao && A.card.contains(ao)) A.pick(+ao.dataset.o);
+  if (A && ab && A.card.contains(ab)) A.next();
+  const cb = e.target.closest('.cbt');
+  if (cb && st.cfmWaiter) chooseConfirm(+cb.dataset.c);
 });
 
 /* Animated cursor: curved path, smooth acceleration, slight jitter and a final correction */
@@ -794,7 +811,7 @@ function refreshHover() {
   let t = null;
   if (cur.classList.contains('on')) {
     const el = document.elementFromPoint(curPos.x, curPos.y);
-    t = el && el.closest('.mi, .pb, .nav-item, #modelBtn, #effortBtn, .chip, .act, .cb, #sendBtn');
+    t = el && el.closest('.mi, .si, .pb, .ask-o, .abtn, .cbt, .nav-item, #modelBtn, .chip, .act, .cb, #sendBtn');
   }
   if (t === hovEl) return;
   if (hovEl) hovEl.classList.remove('hov');
@@ -857,25 +874,11 @@ async function doAct(a, fast) {
   const el = a.el();
   if (!S.fakeCursor || !el) {
     await wait(fast ? 150 : 400);
-    if (a.drag) { setEffort(a.target); syncEffort(); } else a.run();
+    a.run();
     await wait(fast ? 150 : 350);
     return;
   }
   showCursor();
-  if (a.drag) {
-    const r = el.getBoundingClientRect();
-    await humanMove(r.left + r.width / 2 + (Math.random() - 0.5) * 4, r.top + r.height / 2 + (Math.random() - 0.5) * 6, { fast });
-    await wait((fast ? 120 : 220) + Math.random() * 120);
-    cur.classList.add('click');
-    await wait(80);
-    await humanMove(a.toX(), curPos.y + (Math.random() - 0.5) * 3, { fast, noOvershoot: true, bend: 0.06, onMove: x => dragEffortTo(x) });
-    dragEffortTo(a.toX());
-    await wait(fast ? 110 : 200);
-    cur.classList.remove('click');
-    endEffortDrag();
-    await wait((fast ? 180 : 380) + Math.random() * 160);
-    return;
-  }
   const p = pointIn(el);
   await humanMove(p.x, p.y, { fast });
   await wait((fast ? 110 : 200) + Math.random() * (fast ? 100 : 240));
@@ -931,32 +934,108 @@ function startTurnEl() {
 const DOTS = { wave: 3, pinch: 3, fold: 4 };
 const dotsHTML = kind => `<span class="dots ${kind}">${'<i></i>'.repeat(DOTS[kind])}</span>`;
 const pickDots = () => ['wave', 'pinch', 'fold'][Math.floor(Math.random() * 3)];
-// "··· 19m 55s · 2.9k tokens · Thinking" — updates itself every 250 ms.
+// "··· 19m 55s · 2.9k tokens · Thinking". Its clock counts from the start of the turn.
 function setStatus(turnEl, verb) {
   const s = turnEl.querySelector('.status');
   if (!s) return;
-  s.dataset.t0 = performance.now();
+  if (!s.dataset.t0) s.dataset.t0 = performance.now();
+  s.dataset.mode = 'work';
   s.innerHTML = dotsHTML(Math.random() < 0.5 ? 'wave' : 'pinch') + (verb ? `<span class="sl">${esc(verb)}</span>` : '') + '<span class="sm"></span>';
   s.dataset.verb = verb ? '1' : '';
   tickLive();
+}
+// "··· Editing index.html 6m 34s ›" while Claude works on a file.
+function setStatusTask(turnEl, verb, target) {
+  const s = turnEl.querySelector('.status');
+  if (!s) return;
+  s.dataset.mode = 'task';
+  s.innerHTML = dotsHTML('wave') + `<span class="sv">${esc(verb)}</span><span class="sf">${esc(target)}</span><span class="sm"></span>${ic('chevR', 'sc')}`;
+  tickLive();
+}
+// Orange ring + "Needs your input" while a question, a suggestion or a permission waits for you.
+function setStatusInput(turnEl) {
+  const s = turnEl.querySelector('.status');
+  if (!s) return;
+  s.dataset.mode = 'input';
+  s.innerHTML = `<span class="need"></span><span class="nb">${esc(T().needsInput)}</span>`;
 }
 const elapsedOf = el => Math.max(0, Math.floor((performance.now() - +el.dataset.t0) / 1000 * (S.speed || 1)));
 function tickLive() {
   $$('.status', elThread).forEach(s => {
     const m = s.querySelector('.sm');
     if (!m) return;
-    const parts = [fmtDur(elapsedOf(s))];
-    if (st.tokTarget) parts.push(`${fmtTok(st.tok)} tokens`);
+    if (s.dataset.mode === 'task') { m.textContent = fmtDur(elapsedOf(s)); return; }
+    const parts = [fmtDur(elapsedOf(s)), `${fmtTok(st.tok)} tokens`];
     if (!s.dataset.verb) parts.push(T().thinking);
     m.textContent = parts.join(' · ');
   });
   $$('.b-think.live .th-time', elThread).forEach(t => { t.textContent = fmtDur(elapsedOf(t)); });
+  if (st.generating) tickContext();
 }
-setInterval(tickLive, 250);
+setInterval(tickLive, 100);
+// "Worked for 9s · 3.5M tokens" closes the turns whose script sets [tokens].
 function finishTurnEl(el, secs) {
   const s = el.querySelector('.status');
   if (s) s.remove();
-  if (st.tokTarget) addBlock(el, `<div class="usage">${esc(T().worked(fmtDur(secs), fmtTok(st.tokTarget)))}</div>`);
+  if (st.tokExplicit) addBlock(el, `<div class="usage">${esc(T().worked(fmtDur(secs), fmtTok(st.tok)))}</div>`);
+}
+
+/* Token counter: climbs steadily over the whole turn, never in jumps */
+// Tokens per second of thinking, by effort (only used when the script has no [tokens]).
+const THINK_TPS = { low: 18, medium: 30, high: 45, xhigh: 60, max: 80, ultracode: 110 };
+// Expected length of the turn (script time, before the speed setting) and its token total.
+function estimateTurn(steps, pc) {
+  let ms = 0, thinkMs = 0, chars = 0, explicit = 0, pending = null, first = true;
+  const avgEffort = (EFFORT_DELAY[st.effort] || 2400) * (st.thinking ? 1 : 0.6);
+  for (let j = pc; j < steps.length; j++) {
+    const s = steps[j];
+    if (!TURN.has(s.t) && !(INTURN.has(s.t) && continuesTurn(steps, j))) break;
+    if (s.t === 'tokens') { explicit = s.n; continue; }
+    if (s.t === 'pause') { ms += s.secs * 1000; continue; }
+    if (s.t === 'think') { if (s.secs != null) pending = s.secs * 1000; continue; }
+    if (s.t === 'interrupt') break;
+    if (!TURN.has(s.t)) continue;
+    const d = pending != null ? pending : first ? avgEffort : 950;
+    pending = null; first = false;
+    ms += d; thinkMs += d;
+    if (s.t === 'claude') { chars += s.md.length; if (S.reveal === 'stream') ms += s.md.length * 1000 / (S.streamCps || 170); }
+    else if (s.t === 'reasoning') chars += s.text.length;
+    else if (s.t === 'tool' || s.t === 'toolerr') { ms += 1350; chars += s.out.join('\n').length + 40; }
+    else if (s.t === 'edit') { ms += 950; chars += s.diff.reduce((n, x) => n + x.text.length, 0) + 60; }
+    else if (s.t === 'perm') { ms += 1150; chars += 80; }
+    else if (s.t === 'question' || s.t === 'confirm') { chars += s.q.length + s.text.length + s.options.reduce((n, o) => n + o.label.length + o.desc.length, 0); }
+    else if (s.t === 'todos') chars += s.items.reduce((n, x) => n + x.text.length, 0);
+  }
+  const tokens = explicit || Math.round(120 + chars / 3.6 + thinkMs / 1000 * (THINK_TPS[st.effort] || 30));
+  return { ms: Math.max(800, ms), tokens, explicit: !!explicit };
+}
+function startMeter(Tn, est) {
+  st.tok = 0; st.tokTarget = est.tokens; st.tokExplicit = est.explicit;
+  let last = performance.now();
+  Tn.meter = setInterval(() => {
+    const now = performance.now(), dt = now - last;
+    last = now;
+    if (turn !== Tn) { clearInterval(Tn.meter); return; }
+    if (st.paused || st.waitingInput) return;
+    const T0 = st.tokTarget;
+    // Steady pace toward the expected end of the turn, with small changes of speed; past it, it keeps creeping up.
+    const inc = st.tok < T0 * 0.97
+      ? T0 * dt * (S.speed || 1) / est.ms * (0.6 + Math.random() * 0.8)
+      : (T0 - st.tok) * 0.002 * dt / 60;
+    st.tok = Math.min(T0 * 0.995, st.tok + inc);
+  }, 60);
+}
+// At the end of the turn the counter covers whatever is left in about half a second.
+async function finishMeter(Tn) {
+  clearInterval(Tn.meter);
+  const from = st.tok, to = st.tokTarget;
+  if (to - from < to * 0.005) { st.tok = to; return; }
+  for (let u = 0; u < 1;) {
+    await wait(30);
+    u = Math.min(1, u + 30 / 520);
+    st.tok = from + (to - from) * (1 - (1 - u) * (1 - u));
+  }
+  tickLive();
 }
 const blocksOf = el => el.querySelector('.blocks');
 function addBlock(turnEl, html) { const b = h(html); blocksOf(turnEl).appendChild(b); scrollBottom(); return b; }
@@ -1081,20 +1160,11 @@ async function runTurn(steps, pc) {
   const Tn = { interrupted: false, t0: performance.now() };
   turn = Tn;
   st.generating = true;
-  // [tokens X]: the counter climbs during the turn until it reaches X.
-  st.tokTarget = turnTokens(steps, pc);
-  st.tok = 0;
-  const tokTimer = st.tokTarget ? setInterval(() => {
-    if (turn !== Tn) { clearInterval(tokTimer); return; }
-    if (st.paused) return;
-    st.tok += Math.max(st.tokTarget * 0.004, (st.tokTarget - st.tok) * 0.035);
-    if (st.tok > st.tokTarget * 0.97) st.tok = st.tokTarget * 0.97;
-    renderBusy();
-  }, 60) : 0;
+  startMeter(Tn, estimateTurn(steps, pc));
   renderComposer();
   const turnEl = startTurnEl();
   Tn.el = turnEl;
-  let first = true, pendingThink = null, verb = null;
+  let first = true, pendingThink = null, verb = null, reply = null;
   while (pc < steps.length) {
     const s = steps[pc];
     if (!TURN.has(s.t) && !(INTURN.has(s.t) && continuesTurn(steps, pc))) break;
@@ -1122,18 +1192,32 @@ async function runTurn(steps, pc) {
     if (Tn.interrupted) continue;
     first = false;
     if (s.t === 'reasoning') continue;
+    // Several questions in a row share one card with pages.
+    if (s.t === 'question') {
+      const qs = [s];
+      while (pc < steps.length && steps[pc].t === 'question') qs.push(steps[pc++]);
+      await runQuestions(qs, turnEl);
+      continue;
+    }
+    // A suggestion card ends the turn: the button you press is sent as your reply.
+    if (s.t === 'confirm') { reply = await runConfirm(s, turnEl); break; }
     await runVisible(s, Tn, turnEl);
   }
+  if (Tn.interrupted) clearInterval(Tn.meter); else await finishMeter(Tn);
   st.generating = false;
-  clearInterval(tokTimer);
-  st.tok = st.tokTarget;
   if (Tn.interrupted) addBlock(turnEl, `<div class="note">${esc(T().interrupted)}</div>`);
   finishTurnEl(turnEl, Math.max(1, Math.round((performance.now() - Tn.t0) / 1000 * (S.speed || 1))));
-  st.tokTarget = 0;
+  st.sessionTok += st.tok;
+  st.tok = 0; st.tokTarget = 0; st.tokExplicit = false;
   renderComposer();
+  tickContext();
   turn = null;
   if (!st.titled) applyTitle();
   scrollBottom();
+  if (reply != null) {
+    await sendMessage(reply);
+    if (continuesTurn(steps, pc)) return runTurn(steps, pc);
+  }
   return pc;
 }
 async function runVisible(s, Tn, turnEl) {
@@ -1165,23 +1249,33 @@ async function runVisible(s, Tn, turnEl) {
     }
     case 'edit': {
       const b = addTool(turnEl, { icon: 'pencil', label: `${T().edited} ${s.file}` });
+      setStatusTask(turnEl, T().editing, s.file.split(/[\\/]/).pop());
       await wait(700 + Math.random() * 500, true);
+      setStatus(turnEl, null);
       const add = s.diff.filter(d => d.s === '+').length, del = s.diff.filter(d => d.s === '-').length;
       const body = s.diff.map(d => `<span class="dl ${d.s === '+' ? 'add' : d.s === '-' ? 'del' : ''}">${d.s === ' ' ? ' ' : d.s} ${esc(d.text)}</span>`).join('');
       finishTool(b, `+${add} −${del}`, body, false);
+      // The edited file shows up under "Outputs" in the session panel.
+      st.outputs = [s.file, ...st.outputs.filter(f => f !== s.file)];
+      renderRPanel();
       break;
     }
+    // Task list card: filled check (done), spinning ring (in progress), dashed circle (pending).
     case 'todos':
-      addBlock(turnEl, `<div class="todo-card"><div class="tt">${esc(T().todos)}</div>${s.items.map(x => `<div class="todo ${x.s === 'done' ? 'done' : x.s === 'progress' ? 'prog' : ''}"><span class="bx">${x.s === 'done' ? ic('check') : ''}</span><span>${inline(x.text)}</span></div>`).join('')}</div>`);
+      addBlock(turnEl, `<div class="todo-card">${s.items.map(x => `<div class="todo ${x.s === 'done' ? 'done' : x.s === 'progress' ? 'prog' : ''}"><span class="ti">${x.s === 'done' ? ic('check') : ''}</span><span class="tx">${inline(x.text)}</span></div>`).join('')}</div>`);
       break;
     case 'perm': {
       const info = toolInfo(s.name, s.args), L = T();
       const card = addBlock(turnEl, `<div class="perm"><div class="perm-h">${ic(info.icon)}<span>${esc(L.allowQ(s.name))}</span></div>${s.args != null ? `<div class="perm-cmd">${esc(s.args)}</div>` : ''}${s.desc ? `<div class="perm-d">${esc(s.desc)}</div>` : ''}<div class="perm-b"><button class="pb" data-c="3" tabindex="-1">${esc(L.deny)}</button><button class="pb" data-c="2" tabindex="-1">${esc(L.always)}</button><button class="pb pri" data-c="1" tabindex="-1">${esc(L.once)}</button></div></div>`);
-      const target = s.choice || 1;
+      const target = Math.min(3, s.choice || 1);
       const p = track(resolve => { st.permWaiter = { resolve, card }; });
       const driver = driverFor();
+      setStatusInput(turnEl);
+      st.waitingInput = true;
       if (driver !== 'manual') runActions('perm', [{ el: () => card.querySelector(`.pb[data-c="${target}"]`), run: () => choosePerm(target) }], driver).catch(() => {});
       const choice = await p;
+      st.waitingInput = false;
+      setStatus(turnEl, null);
       if (choice === 3) {
         const b = addTool(turnEl, info);
         finishTool(b, L.denied, '', true);
@@ -1206,10 +1300,77 @@ function choosePerm(c) {
   if (st.micro && st.micro.kind === 'perm') finishMicro(st.micro);
   W.resolve(c);
 }
+// "question:" blocks: one card with pages ("1 of 3"). On each page the cursor picks the scripted option and presses
+// Next; at the end the card turns into a summary of the answers. "Other" is always the last option.
+async function runQuestions(qs, turnEl) {
+  const L = T(), answers = qs.map(() => 0);
+  const opts = q => [...q.options, { label: L.other, desc: '' }];
+  const card = addBlock(turnEl, '<div class="ask"></div>');
+  let page = 0;
+  const paint = () => {
+    const q = qs[page], last = page === qs.length - 1;
+    card.innerHTML = `<div class="ask-h"><span class="aq">${inline(q.q)}</span>${qs.length > 1 ? `<span class="pg">${ic('chevL')}<span>${esc(L.of(page + 1, qs.length))}</span>${ic('chevR')}</span>` : ''}</div>`
+      + (q.text ? `<div class="ask-t">${inline(q.text)}</div>` : '')
+      + `<div class="ask-l">${opts(q).map((o, i) => `<div class="ask-o${answers[page] === i ? ' sel' : ''}" data-o="${i}"><span class="rd"></span><span class="ob"><span class="ol">${inline(o.label)}</span>${o.desc ? `<span class="od">${inline(o.desc)}</span>` : ''}</span></div>`).join('')}</div>`
+      + `<div class="ask-f"><button class="abtn" data-a="skip" tabindex="-1">${esc(L.skip)}</button><button class="abtn pri" data-a="next" tabindex="-1">${esc(last ? L.submit : L.next)}<span class="kb">Ctrl</span><span class="kb">⏎</span></button></div>`;
+    scrollBottom();
+  };
+  paint();
+  setStatusInput(turnEl);
+  st.waitingInput = true;
+  const done = track(resolve => {
+    st.askWaiter = {
+      card,
+      pick: i => { answers[page] = i; paint(); },
+      next: () => { if (page < qs.length - 1) { page++; paint(); } else { st.askWaiter = null; resolve(); } },
+    };
+  });
+  const driver = driverFor();
+  if (driver !== 'manual') {
+    const acts = [];
+    qs.forEach(q => {
+      const t = Math.min(opts(q).length, q.choice || 1) - 1;
+      acts.push({ el: () => card.querySelector(`.ask-o[data-o="${t}"]`), run: () => st.askWaiter && st.askWaiter.pick(t) });
+      acts.push({ el: () => card.querySelector('.abtn[data-a="next"]'), run: () => st.askWaiter && st.askWaiter.next() });
+    });
+    runActions('ask', acts, driver).catch(() => {});
+  }
+  await done;
+  st.waitingInput = false;
+  card.replaceWith(h(`<div class="ask-sum">${qs.map((q, i) => `<div class="as-r"><div class="aq">${inline(q.q)}</div><div class="aa">${inline(opts(q)[answers[i]].label)}</div></div>`).join('')}</div>`));
+  setStatus(turnEl, null);
+  scrollBottom();
+}
+// "confirm:" card: text, a question and buttons (the first one is the main one). Returns the label of the button pressed.
+async function runConfirm(s, turnEl) {
+  const opts = s.options.length ? s.options : [{ label: 'Yes' }, { label: 'No' }];
+  const card = addBlock(turnEl, `<div class="cfm"><span class="cx">${ic('x')}</span>${s.text ? `<div class="ct">${mdHTML(s.text)}</div>` : ''}<div class="cq">${inline(s.q)}</div>`
+    + `<div class="cb">${opts.map((o, i) => `<button class="cbt${i === 0 ? ' pri' : ''}" data-c="${i}" tabindex="-1">${inline(o.label)}${i === 0 ? '<span class="kb">Ctrl</span><span class="kb">⏎</span>' : ''}</button>`).join('')}</div></div>`);
+  const target = Math.min(opts.length, s.choice || 1) - 1;
+  setStatusInput(turnEl);
+  st.waitingInput = true;
+  const p = track(resolve => { st.cfmWaiter = { resolve, card }; });
+  const driver = driverFor();
+  if (driver !== 'manual') runActions('confirm', [{ el: () => card.querySelector(`.cbt[data-c="${target}"]`), run: () => chooseConfirm(target) }], driver).catch(() => {});
+  const i = await p;
+  st.waitingInput = false;
+  // The text stays in the conversation; the buttons go away.
+  card.querySelector('.cb').remove();
+  card.querySelector('.cx').remove();
+  return opts[i].label;
+}
+function chooseConfirm(i) {
+  const W = st.cfmWaiter;
+  if (!W) return;
+  st.cfmWaiter = null;
+  if (st.micro && st.micro.kind === 'confirm') finishMicro(st.micro);
+  W.resolve(i);
+}
 async function runMeta(s) {
   switch (s.t) {
     case 'pause': await wait(s.secs * 1000); break;
     case 'title': if (!st.titled) st.title = s.text; break; // shown with the session name; never renames it
+    case 'context': if (s.pct != null) { st.ctxLeft = s.pct; tickContext(); } break; // context left, as in the terminal
     case 'info': {
       // Inside a turn it goes in place (before whatever comes next), not at the end of the thread.
       const el = h(`<div class="info">${inline(s.text)}</div>`);
@@ -1241,18 +1402,18 @@ async function modelFlow(tg, driver) {
   const tEffort = tg.effort || st.effort;
   const tFast = tg.fast != null ? tg.fast : st.fast;
   const acts = [];
+  // Model (and fast mode): open the menu and click the model, which closes it.
   if (tModel !== st.model || tFast !== st.fast) {
     acts.push({ el: () => $('#modelBtn'), run: () => openMenu() });
-    if (tFast !== st.fast) acts.push({ el: () => $('#menu [data-act="fast"] .sw'), run: () => toggleFast() });
-    acts.push({ el: () => $(`#menu [data-i="${tIdx}"]`), run: () => selectModel(tIdx) });
+    if (tFast !== st.fast) acts.push({ el: () => $('#menu [data-act="fast"]'), run: () => toggleFast() });
+    if (tIdx >= 0) acts.push({ el: () => $(`#menu [data-i="${tIdx}"]`), run: () => selectModel(tIdx) });
+    else acts.push({ el: () => $('#cInput'), run: () => closeMenu() });
   }
+  // Effort: open the menu again, open the "Effort" submenu and click the level.
   if (tEffort !== st.effort) {
-    acts.push({ el: () => $('#effortBtn'), run: () => openEffort() });
-    acts.push({
-      drag: true, target: tEffort, el: () => $('#epThumb'),
-      toX: () => { const r = $('#epTrack').getBoundingClientRect(); return r.left + r.width * EPOS(EFFORTS.indexOf(tEffort)) / 100; },
-    });
-    acts.push({ el: () => $('#cInput'), run: () => closeEffort() });
+    acts.push({ el: () => $('#modelBtn'), run: () => openMenu() });
+    acts.push({ el: () => $('#menu [data-sub="effort"]'), run: () => openSub('effort') });
+    acts.push({ el: () => $(`#submenu [data-e="${tEffort}"]`), run: () => chooseEffort(tEffort) });
   }
   if (acts.length) await runActions('model', acts, driver);
 }
@@ -1345,7 +1506,7 @@ document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && (e.key === 'o' || e.key === 'O')) { e.preventDefault(); toggleDetail(); return; }
   if (e.key === 'Tab') { e.preventDefault(); return; }
   if (st.micro) { microKey(e); return; }
-  if (e.key === 'Escape') { e.preventDefault(); if (st.menu) closeMenu(); else if (st.effortPop) closeEffort(); else if (turn && !turn.interrupted) turn.interrupted = true; return; }
+  if (e.key === 'Escape') { e.preventDefault(); if (st.menu) closeMenu(); else if (turn && !turn.interrupted) turn.interrupted = true; return; }
   if (st.magic) { magicKey(e); return; }
   if (st.free) { freeKey(e); return; }
   if (st.waitingStart && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); startNow(); return; }
@@ -1383,10 +1544,15 @@ function resetState() {
   const H = keys => { for (const k of keys) if (hdr[k] != null && hdr[k] !== '') return hdr[k]; return null; };
   st.steps = steps; st.warn = warn;
   const cwd = H(['carpeta', 'cwd', 'directorio', 'dir', 'ruta']);
+  const dirs = cwd ? cwd.split(/[\\/]/).filter(d => d && d !== '~') : [];
   st.hdr = {
     user: H(['usuario', 'user', 'nombre', 'name']) ?? '', plan: H(['plan', 'cuenta']) ?? 'Claude Max', greeting: H(['saludo', 'greeting']),
-    folder: cwd ? cwd.split(/[\\/]/).filter(Boolean).pop() : '',
+    folder: dirs[dirs.length - 1] || '', parent: dirs[dirs.length - 2] || '',
+    branch: H(['rama', 'branch']) || 'main', connectors: H(['conectores', 'connectors']) || '4',
   };
+  st.ctxLeft = num(H(['contexto', 'context']));
+  st.outputs = String(H(['outputs', 'resultados', 'salidas']) || '').split(',').map(x => x.trim()).filter(Boolean);
+  st.sessionTok = 0;
   st.model = findModel(H(['modelo', 'model']) || '') || MODELS[0];
   st.effort = parseEffort(H(['esfuerzo', 'effort']) || '') || 'medium';
   st.thinking = EFFORTS.indexOf(st.effort) >= 2;
@@ -1400,11 +1566,11 @@ function resetState() {
     peak: H(['horapico', 'hora_pico', 'peakhour']) || '11 PM', fav: H(['modelofavorito', 'modelo_favorito', 'favoritemodel']) || 'Opus 5.5',
     moby: H(['moby', 'mobydick']) || '49142',
   };
-  closeEffort();
-  Object.assign(st, { tok: 0, tokTarget: 0, title: tg, titled: false, cur: -1, input: '', generating: false, menu: null, effortPop: null, micro: null, permWaiter: null, magic: null, free: null, paused: false, waitingStart: false, startResolve: null, playing: false, finished: false });
+  Object.assign(st, { tok: 0, tokTarget: 0, tokExplicit: false, title: tg, titled: false, cur: -1, input: '', generating: false, menu: null, micro: null, permWaiter: null, askWaiter: null, cfmWaiter: null, waitingInput: false, magic: null, free: null, paused: false, waitingStart: false, startResolve: null, playing: false, finished: false });
   turn = null;
   elThread.innerHTML = '';
   $('#menu').hidden = true;
+  $('#submenu').hidden = true;
   cur.classList.remove('on');
   setEmpty(true);
 }

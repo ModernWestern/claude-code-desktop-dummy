@@ -111,8 +111,8 @@ body.light .mac{background:#e9e7e9;color:#4d4d4d;border-bottom-color:#cfcfcf}
 #panel button.btn.primary:hover{background:#e0866a}
 #panel .small button.btn{font-size:12px;padding:6px 8px}
 #panel .keys{font-size:11.5px;color:#8c8c95;line-height:1.7}
-#panel .swap{font-size:12.5px;color:#e39a7f;text-decoration:none}
-#panel .swap:hover{text-decoration:underline}
+#panel .ver{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px}
+#panel .ver label{color:#c7c7cd}
 #panel kbd{font:11px "Cascadia Mono",Consolas,monospace;background:#26262c;border:1px solid #393941;border-bottom-width:2px;border-radius:4px;padding:0 5px;color:#ddd}
 #panel .state{font-size:12px;color:#c9c9cf;display:flex;align-items:center;gap:7px}
 #panel .state i{width:8px;height:8px;border-radius:50%;background:#666;display:inline-block}

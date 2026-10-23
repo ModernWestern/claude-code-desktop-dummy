@@ -27,6 +27,9 @@ window.EXAMPLE_SCRIPT = `
 @peakhour: 3 AM
 @favoritemodel: Opus 5.5
 @moby: 1337
+// Claude Desktop session panel (right side): git branch and connected connectors
+@branch: main
+@connectors: 4
 
 // ── 2. THE CONVERSATION ── "user:" is you, "claude:" is Claude.
 // Claude's answers can span many lines and use Markdown.
@@ -52,7 +55,7 @@ claude: Got it. In physics, a black hole is something that is **in space**.
 
 More precisely, it's *up there*. Sometimes a little to the left, depending on where you're standing.
 
-// ── 4. MAXIMUM POWER ── ultracode is the highest effort (purple pixel bar)
+// ── 4. MAXIMUM POWER ── ultracode is the highest effort (shown in purple)
 user: /model {opus ultracode}
 
 user: Claude, explain what a black hole REALLY is in physics
@@ -82,6 +85,13 @@ In short: it's a pothole, but in \`dark mode\`.
 user: claude please
 
 [think 3]
+// question: Claude asks you something — one option per line: "- Label | description" ("Other" is added for you)
+// [choose N] picks the answer · several questions in a row become one card with pages
+question: How should I fix physics?
+- Delete it (Recommended) | No physics, no black holes. Problem solved.
+- Rename it to "Potholeology" | Same chaos, better name.
+[choose 1]
+
 // permission: Tool(args) | description — then [choose 1|2|3]
 // 1 = Yes / Allow once · 2 = Always allow · 3 = No (interrupts Claude)
 permission: Bash(rm -rf ~/physics) | Deletes the physics folder to avoid further confusion
@@ -93,7 +103,8 @@ claude: Done. Physics no longer exists, so technically black holes don't either.
 // ── 5. BONUS ROUND ── everything else the simulator can do
 // [pause N] = wait N seconds (nothing happens on screen)
 [pause 2]
-// [context N%] and [mode plan|edits|bypass|normal] only change the Claude Code footer
+// [context N%] = context left (terminal footer; the Desktop session panel shows it as used)
+// [mode plan|edits|bypass|normal] only changes the terminal footer
 [context 4%]
 
 user: ok... at least fix my astronomy homework
@@ -121,6 +132,17 @@ edit: homework/astronomy-final-FINAL-v2.md
 + The Moon is the Sun's night shift.
 
 claude: Homework fixed. I also renamed the Moon to **"Night Sun"** for consistency.
+
+// confirm: a suggestion with buttons — plain lines are the text, "- " lines are the buttons (the first is the main one)
+// [choose N] clicks one: its label becomes your reply, and the lines after it are Claude's answer
+confirm: Want me to grade it too?
+I can also give your homework a grade before you hand it in.
+- Yes, grade it
+- No thanks
+[choose 1]
+
+[think 2]
+claude: Graded: **A+**. I also gave the Moon an F for showing up during the day.
 
 user: please stop
 // [interrupt] = Claude gets interrupted mid-answer

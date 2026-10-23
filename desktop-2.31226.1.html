@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg stroke='%23D97757' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M16 4v24M4 16h24M7.5 7.5l17 17M24.5 7.5l-17 17'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/desktop-2.31226.1.css">
+</head>
+<body>
+<div id="stage"><div id="win">
+  <div id="topbar">
+    <div class="tb-left" id="tbLeft">
+      <span class="lights"><i></i><i></i><i></i></span>
+      <span class="tbi" data-ic="menu"></span><span class="tbi" data-ic="panel"></span><span class="tbi" data-ic="back"></span><span class="tbi" data-ic="fwd"></span>
+      <div class="sp"></div>
+      <div class="seg2"><span class="tbi" data-ic="chat"></span><span class="tbi on" data-ic="code"></span></div>
+    </div>
+    <div class="tb-main">
+      <span class="tb-ico" data-ic="laptop"></span><span id="titleText"></span><span class="tb-chev" data-ic="chev"></span><span class="badge2" id="folderBadge"></span>
+      <div class="sp"></div>
+      <span class="tbi" data-ic="terminal"></span><span class="tbi" data-ic="diff"></span><span class="tbi" data-ic="globe"></span><span class="tbi" data-ic="folder"></span><span class="tbi" data-ic="dots"></span>
+      <span id="winCtl"><span data-ic="min"></span><span data-ic="max"></span><span data-ic="x"></span></span>
+    </div>
+  </div>
+  <div id="app">
+    <aside id="side">
+      <div class="search"><span data-ic="search"></span><span data-l="search"></span></div>
+      <div class="nav">
+        <div class="nav-item new"><span data-ic="plus"></span><span data-l="newSession"></span></div>
+      </div>
+      <!-- Like the app: Search and New stay fixed; everything else scrolls with a single scrollbar. -->
+      <div id="sideScroll">
+        <div class="nav">
+          <div class="nav-item"><span data-ic="shapes"></span><span data-l="artifacts"></span></div>
+          <div class="nav-item"><span data-ic="briefcase"></span><span data-l="customize"></span></div>
+          <div class="nav-item more"><span data-ic="chevR"></span><span data-l="moreNav"></span></div>
+        </div>
+        <div id="groups"></div>
+      </div>
+      <div class="side-foot"><span class="av" id="avatar"></span><span class="uname"><span id="uname"></span><span class="uplan" id="uplan"></span></span><span class="ic2" data-ic="chev"></span><div class="sp"></div><span class="ic2" data-ic="bug"></span></div>
+    </aside>
+    <main id="main" class="empty">
+      <div id="scroll"><div id="thread"></div></div>
+      <div id="home"><div class="home-col"><div class="hgreet" id="hgreet"></div><div class="stats" id="stats"></div></div></div>
+      <div id="center">
+        <div id="greet"></div>
+        <div id="composerWrap">
+          <div id="ctx"><span class="ctxb"><span data-ic="laptop"></span>Local</span><span class="ctxb"><span data-ic="folder"></span><span id="ctxFolder"></span></span></div>
+          <div id="composer"><canvas class="clawd" id="clawd" aria-hidden="true"></canvas>
+            <div id="cInput"><span id="cText"></span><span id="caret"></span><span id="cPh"></span></div>
+            <button id="sendBtn" tabindex="-1"></button>
+          </div>
+          <div class="c-row">
+            <span class="cb2" data-ic="plus"></span><span class="cb2" data-ic="mic"></span><span class="cb2 sm" data-ic="chev"></span><span class="auto">Auto</span>
+            <div class="sp"></div>
+            <button id="modelBtn" tabindex="-1"><span id="modelName"></span></button>
+            <button id="effortBtn" tabindex="-1"><span id="effortName"></span><span id="effortWarn"></span></button>
+            <span id="busy"></span>
+          </div>
+          <div id="chips"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div></div>
+<div id="menu" hidden></div>
+<div id="effortPop" hidden></div>
+<div id="fakeCursor"><svg width="22" height="26" viewBox="0 0 22 26"><path d="M3 2v19.2l4.9-4.6 3.1 7.1 3.3-1.4-3.1-7h6.6z" fill="#fff" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+<div id="toast"></div>
+<input type="file" id="fileIn" accept=".txt,.md,text/plain" hidden>
+
+<aside id="panel" aria-label="Script panel">
+  <header>
+    <div class="ttl"><svg width="18" height="18" viewBox="0 0 32 32"><g stroke="#D97757" stroke-width="3.4" stroke-linecap="round"><path d="M16 4v24M4 16h24M7.5 7.5l17 17M24.5 7.5l-17 17"/></g></svg>Claude Code Desktop Dummy</div>
+    <button class="x" id="pClose" title="Close (F2)">✕</button>
+  </header>
+  <nav>
+    <button data-tab="guion" class="on">Script</button>
+    <button data-tab="ajustes">Settings</button>
+    <button data-tab="ayuda">Syntax</button>
+  </nav>
+
+  <section data-pane="guion" class="on">
+    <div class="ver"><label for="versionSel">Interface</label><select id="versionSel"></select></div>
+    <div class="seg" id="modeSeg">
+      <button data-mode="magic">My pace</button>
+      <button data-mode="auto">Automatic</button>
+      <button data-mode="free">Free</button>
+    </div>
+    <p class="hint" id="modeHint"></p>
+    <div class="ins" id="insRow"><span>Insert:</span>
+      <button data-snip="[tokens 3.5M]" title="Tokens Claude's answer burns">tokens</button>
+      <button data-snip="[think 5]" title="Seconds Claude thinks before answering">think</button>
+      <button data-snip="reasoning: " title="Claude's thinking block">reasoning</button>
+      <button data-snip="tool: Web Search(&quot;query&quot;)" title="Tool call">tool</button>
+      <button data-snip="user: /model {opus max}" title="Switch model and effort">model</button>
+      <button data-snip="[pause 2]" title="Pause">pause</button>
+    </div>
+    <textarea id="script" spellcheck="false"></textarea>
+    <div class="status" id="parseStatus"></div>
+    <div class="btns">
+      <button class="btn primary" id="bPlay">▶ Play</button>
+      <button class="btn" id="bRestart">↺ Restart</button>
+      <button class="btn" id="bFull">⛶ Full screen</button>
+    </div>
+    <div class="btns small">
+      <button class="btn" id="bOpen">Open .txt</button>
+      <button class="btn" id="bSave">Save .txt</button>
+      <button class="btn" id="bExample">Load example</button>
+    </div>
+    <div class="state" id="runState"><i></i><span></span></div>
+    <div class="keys"><kbd>F2</kbd> panel · <kbd>F8</kbd> play / pause · <kbd>F9</kbd> restart · <kbd>Ctrl</kbd>+<kbd>O</kbd> expand/collapse thinking · <kbd>Esc</kbd> stop answer · <kbd>F11</kbd> full screen</div>
+  </section>
+
+  <section data-pane="ajustes">
+    <h4>Appearance</h4>
+    <div class="f"><label>Theme</label><select data-k="theme">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select></div>
+    <div class="f"><label>Interface language</label><select data-k="lang">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+    </select></div>
+    <div class="f"><label>Window frame</label><select data-k="frame">
+      <option value="none">None (full screen)</option>
+      <option value="win">Windows window</option>
+      <option value="mac">macOS window</option>
+    </select></div>
+    <div class="f"><label>Zoom</label><div class="v"><input type="range" min="0.7" max="1.6" step="0.05" data-k="zoom"><output data-o="zoom"></output></div></div>
+    <label class="chk"><input type="checkbox" data-k="sidebar">Show sidebar</label>
+    <label class="chk"><input type="checkbox" data-k="fakeCursor">Animated cursor when switching model or effort (Automatic and My pace modes)</label>
+    <div class="f"><label>Mouse speed</label><div class="v"><input type="range" min="0.4" max="2" step="0.05" data-k="mouseSpeed"><output data-o="mouseSpeed"></output></div></div>
+    <h4>Timing</h4>
+    <div class="f"><label>Global speed</label><div class="v"><input type="range" min="0.25" max="3" step="0.05" data-k="speed"><output data-o="speed"></output></div></div>
+    <div class="f"><label>Typing (chars/sec)</label><div class="v"><input type="range" min="4" max="40" step="1" data-k="typeCps"><output data-o="typeCps"></output></div></div>
+    <div class="f"><label>How answers appear</label><select data-k="reveal">
+      <option value="stream">Streaming (like Claude)</option>
+      <option value="block">All at once</option>
+    </select></div>
+    <div class="f"><label>Streaming (chars/sec)</label><div class="v"><input type="range" min="40" max="900" step="10" data-k="streamCps"><output data-o="streamCps"></output></div></div>
+    <div class="f"><label>Letters per key</label><div class="v"><input type="range" min="1" max="4" step="1" data-k="charsPerKey"><output data-o="charsPerKey"></output></div></div>
+    <div class="f"><label>Start delay (sec)</label><input type="number" min="0" max="15" step="0.5" data-k="startDelay"></div>
+    <label class="chk"><input type="checkbox" data-k="hideMouse">Hide the mouse pointer when it stops moving</label>
+    <label class="chk"><input type="checkbox" data-k="toasts">Show notices (pause, restart…)</label>
+    <h4>Sidebar: groups and sessions</h4>
+    <p class="hint">One line per group. Below it, its sessions starting with <code style="font:11.5px Cascadia Mono,monospace">- </code> (or <code style="font:11.5px Cascadia Mono,monospace">* </code> for a filled dot). The script's session shows up under “Ungrouped”.</p>
+    <textarea id="recentsTa" data-k="recents" spellcheck="false"></textarea>
+    <h4>Model picker</h4>
+    <p class="hint">One line per model: <code style="font:11.5px Cascadia Mono,monospace">alias | name | badge</code> (the badge is optional, e.g. “Default”). Leave it empty to use the defaults for the chosen language.</p>
+    <textarea id="models" data-k="models" spellcheck="false"></textarea>
+    <div class="btns small">
+      <button class="btn" id="bModelsReset">Reset models</button>
+      <button class="btn" id="bSettingsReset">Reset all settings</button>
+    </div>
+  </section>
+
+  <section data-pane="ayuda">
+    <div class="doc">
+      <h3>Same script as Claude Code</h3>
+      <p>Both simulators use exactly the same format (<code>user:</code>, <code>claude:</code>, <code>[think]</code>, <code>tool:</code>…). If you open both from the same folder in the same browser, they share the script. Spanish keywords (<code>yo:</code>, <code>[pensar]</code>…) work too.</p>
+      <h3>The basics</h3>
+<pre>user: claude what are black holes
+
+claude: A black hole is a **pothole**.
+
+1. It rains
+2. A truck drives by</pre>
+      <p>Each block starts at the beginning of a line. Claude's answer can span many lines and supports Markdown: <code>**bold**</code>, <code>*italic*</code>, <code>`code`</code>, lists, headings, tables and code blocks. Lines starting with <code>//</code> are comments.</p>
+      <h3>How each directive looks in Desktop</h3>
+      <table>
+        <tr><td><code>user: /model {opus max}</code></td><td>The cursor opens the model picker and selects Opus, then opens “Effort” and drags the bar to Max. Nothing is typed in the chat.</td></tr>
+        <tr><td>effort</td><td><code>low</code> · <code>medium</code> · <code>high</code> · <code>xhigh</code> · <code>max</code> · <code>ultracode</code> (the bar fills with animated purple pixels).</td></tr>
+        <tr><td><code>user: /effort ultracode</code></td><td>Changes only the effort.</td></tr>
+        <tr><td><code>{opus fast}</code></td><td>Also turns on “Enable fast mode” in the menu.</td></tr>
+        <tr><td><code>[think 8 Phrase]</code></td><td>“Phrase” shows up as a live thinking block while Claude thinks for 8 seconds.</td></tr>
+        <tr><td><code>reasoning:</code></td><td>Collapsible thinking block. Optional title: <code>reasoning: [Concluded it is a pothole] text…</code></td></tr>
+        <tr><td><code>tool:</code></td><td>Tool row (web search, command…). The first output line shows next to it; <kbd>Ctrl</kbd>+<kbd>O</kbd> expands it.</td></tr>
+        <tr><td><code>tool-error:</code></td><td>A tool that fails.</td></tr>
+        <tr><td><code>edit: file</code></td><td>A file edit with a diff (<code>@@ N</code>, <code>-</code> removed, <code>+</code> added).</td></tr>
+        <tr><td><code>todos:</code></td><td>Checklist: <code>[x]</code> done · <code>[&gt;]</code> in progress · <code>[ ]</code> pending.</td></tr>
+        <tr><td><code>permission:</code></td><td>“Allow Claude to use Bash?” card. <code>[choose 1]</code> = Allow once, <code>2</code> = Always allow, <code>3</code> = Deny.</td></tr>
+        <tr><td><code>[tokens 3.5M]</code></td><td>The counter next to the spinner climbs to that number and ends with “Worked for 9s · 3.5M tokens”. Accepts <code>800k</code>, <code>1200000</code>…</td></tr>
+        <tr><td><code>[error]</code></td><td>Red notice. Without text it shows the classic “capacity constraints” message.</td></tr>
+        <tr><td><code>[info text]</code></td><td>A small gray system line.</td></tr>
+        <tr><td><code>[interrupt]</code></td><td>Claude's answer gets interrupted.</td></tr>
+        <tr><td><code>[pause 2]</code></td><td>Waits 2 seconds.</td></tr>
+        <tr><td><code>/compact</code> · <code>[compact]</code></td><td>“Compacting our conversation…” animation.</td></tr>
+        <tr><td><code>/clear</code> · <code>[clear]</code></td><td>The cursor clicks “New”.</td></tr>
+        <tr><td><code>[title Text]</code> · <code>@title</code></td><td>Session title (shown after the first answer and in the sidebar). Without them, the first message names the session. Once named, it never changes: a later <code>[title]</code> is ignored until <code>/clear</code> starts a new session.</td></tr>
+        <tr><td><code>@greeting</code></td><td>Home screen greeting (default “What’s up next, &lt;user&gt;?”).</td></tr>
+        <tr><td><code>@sessions</code> … <code>@moby</code></td><td>Numbers on the home screen stats card: <code>@sessions</code>, <code>@messages</code>, <code>@totaltokens</code>, <code>@activedays</code>, <code>@peakhour</code>, <code>@favoritemodel</code>, <code>@moby</code>.</td></tr>
+      </table>
+      <p><code>[mode]</code> and <code>[context]</code> only exist in the terminal version; they are ignored here.</p>
+      <h3>Modes</h3>
+      <table>
+        <tr><td>My pace</td><td>Every key you press types the next letter of your scripted line (9 keys = 9 letters). <kbd>Enter</kbd> sends it and Claude answers. In the model picker and permission cards, each key is one cursor click; <kbd>Enter</kbd> completes everything.</td></tr>
+        <tr><td>Automatic</td><td>Everything plays by itself. <kbd>Space</kbd> or <kbd>F8</kbd> to start and pause.</td></tr>
+        <tr><td>Free</td><td>You type for real; Claude answers with its next scripted turn. You can use the real mouse on the model picker and permission cards.</td></tr>
+      </table>
+      <p>In any mode you can really click the model picker, the thinking blocks and the permission buttons.</p>
+    </div>
+  </section>
+</aside>
+
+<script src="js/example-script.js"></script>
+<script src="js/versions.js"></script>
+<script src="js/clawd-frames.js"></script>
+<script src="js/desktop-2.31226.1.js"></script>
+</body>
+</html>

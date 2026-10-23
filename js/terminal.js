@@ -90,7 +90,8 @@ const EXAMPLE = (window.EXAMPLE_SCRIPT || '').replace(/^\s*\n/, ''); // js/examp
 const storedScript = lsGet(LS_SCRIPT);
 const firstRun = storedScript == null;
 // An old built-in example saved in the browser is replaced by the current one; a script you wrote is kept.
-const isOldExample = t => (/GUION DE EJEMPLO/.test(t || '') && /agujeros negros/i.test(t || '')) || (/CLAUDE SIMULATOR · EXAMPLE SCRIPT/.test(t || '') && /^(@user: Alex|user: ultrathink .*|\[title Physics rescue attempt\])$/m.test(t || ''));
+// Built-in examples older than 2026-10-23 have no "question:" block.
+const isOldExample = t => (/GUION DE EJEMPLO/.test(t || '') && /agujeros negros/i.test(t || '')) || (/CLAUDE SIMULATOR · EXAMPLE SCRIPT/.test(t || '') && !/^question:/m.test(t || ''));
 let SCRIPT = storedScript && storedScript.trim() && !isOldExample(storedScript) ? storedScript : EXAMPLE;
 if (storedScript && isOldExample(storedScript)) lsSet(LS_SCRIPT, EXAMPLE);
 
@@ -129,6 +130,7 @@ const BLOCKS = {
   razonamiento: 'reasoning', pensamiento: 'reasoning', thinking: 'reasoning', reasoning: 'reasoning',
   tool: 'tool', herramienta: 'tool', 'tool-error': 'toolerr', 'herramienta-error': 'toolerr', toolerror: 'toolerr',
   editar: 'edit', edit: 'edit', tareas: 'todos', todos: 'todos', todo: 'todos', permiso: 'perm', permission: 'perm',
+  pregunta: 'question', question: 'question', confirmar: 'confirm', confirm: 'confirm',
 };
 const DIRS = {
   pensar: a => { const m = a.match(/^\s*(\d+(?:[.,]\d+)?)\s*(?:s|seg|segundos|sec)?\b\s*(.*)$/i); return m ? { t: 'think', secs: parseFloat(m[1].replace(',', '.')), verb: m[2].trim() || null } : { t: 'think', secs: null, verb: a.trim() || null }; },
@@ -141,7 +143,7 @@ const DIRS = {
   interrumpir: () => ({ t: 'interrupt' }),
   limpiar: () => ({ t: 'clear' }),
   compactar: () => ({ t: 'compact' }),
-  elegir: a => ({ t: 'choose', n: Math.max(1, Math.min(3, num(a) || 1)) }),
+  elegir: a => ({ t: 'choose', n: Math.max(1, Math.min(9, num(a) || 1)) }),
   detalle: () => ({ t: 'detail' }),
   tokens: a => ({ t: 'tokens', n: parseTokens(a) }),
 };
@@ -154,7 +156,9 @@ const DIR_ALIAS = {
   limpiar:'limpiar', clear:'limpiar', compactar:'compactar', compact:'compactar',
   elegir:'elegir', opcion:'elegir', choose:'elegir', detalle:'detalle', 'ctrl+o':'detalle', detail:'detalle', tokens:'tokens', token:'tokens', gasto:'tokens', consumo:'tokens',
 };
-const TURN = new Set(['claude','reasoning','tool','toolerr','edit','todos','perm','error','interrupt','think']);
+const TURN = new Set(['claude','reasoning','tool','toolerr','edit','todos','perm','question','confirm','error','interrupt','think']);
+// Steps that wait for an answer: [choose N] picks it.
+const ASKS = new Set(['perm', 'question', 'confirm']);
 const INTURN = new Set(['pause','mode','context','title','info','detail','tokens']);
 // "3.5M", "3,5 millones", "800k", "1200000" → number of tokens
 function parseTokens(a) {
@@ -164,11 +168,6 @@ function parseTokens(a) {
   const v = parseFloat(m[1].replace(',', '.'));
   const mult = { k: 1e3, mil: 1e3, m: 1e6, mm: 1e6, millones: 1e6, millon: 1e6, b: 1e9, billones: 1e9 }[m[2]] || 1;
   return Math.round(v * mult);
-}
-// Finds a [tokens] directive inside the turn starting at pc (including loose directives at the end of the turn).
-function turnTokens(steps, pc) {
-  for (let j = pc; j < steps.length && (TURN.has(steps[j].t) || INTURN.has(steps[j].t)); j++) if (steps[j].t === 'tokens') return steps[j].n;
-  return 0;
 }
 
 function trimBlank(arr) {
@@ -232,6 +231,15 @@ function finalize(c) {
     }
     case 'edit': return { t: 'edit', file: c.head.trim() || 'file.txt', diff: parseDiff(trimBlank(c.lines)), line: c.line };
     case 'todos': return { t: 'todos', items: all.filter(l => l.trim()).map(parseTodo), line: c.line };
+    // "- Label | description" lines are the options; any other line is extra text.
+    case 'question': case 'confirm': {
+      const options = [], text = [];
+      for (const l of c.lines) {
+        const m = l.match(/^\s*[-*]\s+(.*)$/);
+        if (m) { const [label, desc = ''] = m[1].split('|').map(x => x.trim()); options.push({ label, desc }); } else text.push(l);
+      }
+      return { t: c.t, q: c.head.trim(), text: trimBlank(text).join('\n'), options, choice: 1, line: c.line };
+    }
   }
   return null;
 }
@@ -267,8 +275,8 @@ function compile(src) {
   let titled = !!(hdr.titulo || hdr.title);
   for (const s of steps) {
     if (s.t === 'choose') {
-      const p = [...out].reverse().find(x => x.t === 'perm');
-      if (p) p.choice = s.n; else warn.push(`Line ${s.line}: [choose] without a "permission:" before it`);
+      const p = [...out].reverse().find(x => ASKS.has(x.t));
+      if (p) p.choice = s.n; else warn.push(`Line ${s.line}: [choose] without a "permission:", "question:" or "confirm:" before it`);
       continue;
     }
     if (s.t === 'clear' || (s.t === 'user' && /^\/clear\b/i.test(s.text))) titled = false;
@@ -596,6 +604,7 @@ function itemHTML(it) {
     case 'interrupted': return resultHTML(['<span class="c-err">Interrupted</span><span class="c-dim"> · What should Claude do instead?</span>']);
     case 'worked': return g + `<div class="c-dim">✻ ${esc(it.verb)} for ${fmtDur(it.secs)}${it.tokens ? ` · ↓ ${fmtTok(it.tokens)} tokens` : ''}</div>`;
     case 'compacted': return g + '<div class="c-dim">✻ Conversation compacted · ctrl+o for history</div>';
+    case 'answers': return g + dotRow('●', 'User answered Claude\'s questions:') + resultHTML(it.rows.map(r => `<span class="c-dim">· ${inline(r.q)} → </span>${inline(r.a)}`));
   }
   return '';
 }
@@ -783,8 +792,11 @@ setInterval(() => {
   const sp = st.spin;
   if (!sp || st.dialog || st.paused) return;
   sp.elapsed += dt; sp.acc += dt; sp.gacc += dt;
-  if (sp.target) sp.tokens = Math.min(sp.target * 0.97, sp.tokens + Math.max(sp.target * 0.004, (sp.target - sp.tokens) * 0.03) * dt / 50);
-  else sp.tokens += dt / 1000 * sp.rate;
+  if (sp.target) {
+    // Steady pace toward the expected end of the turn, with small changes of speed; past it, it keeps creeping up.
+    const inc = sp.tokens < sp.target * 0.97 ? sp.target * dt * (S.speed || 1) / sp.estMs * (0.6 + Math.random() * 0.8) : (sp.target - sp.tokens) * 0.002 * dt / 60;
+    sp.tokens = Math.min(sp.target * 0.995, sp.tokens + inc);
+  } else sp.tokens += dt / 1000 * sp.rate;
   if (Math.random() < 0.04) sp.rate = 12 + Math.random() * 70;
   while (sp.acc >= 120) { sp.acc -= 120; sp.frame++; }
   while (sp.gacc >= 55) { sp.gacc -= 55; sp.glint++; if (sp.glint > clen(sp.verb) + 9) sp.glint = -4; }
@@ -918,13 +930,42 @@ async function freeStep(steps, pc) {
   submitUser(t);
   return runTurn(steps, pc);
 }
+/* Token counter: climbs steadily over the whole turn, never in jumps */
+// Tokens per second of thinking, by effort (only used when the script has no [tokens]).
+const THINK_TPS = { low: 18, medium: 30, high: 45, xhigh: 60, max: 80, ultracode: 110 };
+// Expected length of the turn (script time, before the speed setting) and its token total.
+function estimateTurn(steps, pc) {
+  let ms = 0, thinkMs = 0, chars = 0, explicit = 0, pending = null, first = true;
+  const avgEffort = st.model && st.model.effort ? EFFORT_DELAY[st.effort] : 1100;
+  for (let j = pc; j < steps.length; j++) {
+    const s = steps[j];
+    if (!TURN.has(s.t) && !(INTURN.has(s.t) && continuesTurn(steps, j))) break;
+    if (s.t === 'tokens') { explicit = s.n; continue; }
+    if (s.t === 'pause') { ms += s.secs * 1000; continue; }
+    if (s.t === 'think') { if (s.secs != null) pending = s.secs * 1000; continue; }
+    if (s.t === 'interrupt') break;
+    if (!TURN.has(s.t)) continue;
+    const d = pending != null ? pending : first ? avgEffort : 950;
+    pending = null; first = false;
+    ms += d; thinkMs += d;
+    if (s.t === 'claude') { chars += s.md.length; if (S.reveal === 'stream') ms += s.md.length * 1000 / (S.streamCps || 300); }
+    else if (s.t === 'reasoning') chars += s.text.length;
+    else if (s.t === 'tool' || s.t === 'toolerr') { ms += 1250; chars += s.out.join('\n').length + 40; }
+    else if (s.t === 'edit') { ms += 850; chars += s.diff.reduce((n, x) => n + x.text.length, 0) + 60; }
+    else if (s.t === 'perm') { ms += 1050; chars += 80; }
+    else if (s.t === 'question' || s.t === 'confirm') { ms += 1200; chars += s.q.length + s.text.length + s.options.reduce((n, o) => n + o.label.length + o.desc.length, 0); }
+    else if (s.t === 'todos') chars += s.items.reduce((n, x) => n + x.text.length, 0);
+  }
+  const tokens = explicit || Math.round(120 + chars / 3.6 + thinkMs / 1000 * (THINK_TPS[st.effort] || 30));
+  return { ms: Math.max(800, ms), tokens, explicit: !!explicit };
+}
 async function runTurn(steps, pc) {
   const T = { interrupted: false };
   turn = T;
   startSpinner();
-  const tokTarget = turnTokens(steps, pc);
-  if (tokTarget) st.spin.target = tokTarget;
-  let first = true, pendingThink = null;
+  const est = estimateTurn(steps, pc);
+  Object.assign(st.spin, { target: est.tokens, estMs: est.ms });
+  let first = true, pendingThink = null, reply = null;
   while (pc < steps.length) {
     const s = steps[pc];
     if (!TURN.has(s.t) && !(INTURN.has(s.t) && continuesTurn(steps, pc))) break;
@@ -943,21 +984,51 @@ async function runTurn(steps, pc) {
     await wait(ms, true);
     if (T.interrupted) continue;
     first = false;
+    // Several questions in a row are answered together.
+    if (s.t === 'question') {
+      const qs = [s];
+      while (pc < steps.length && steps[pc].t === 'question') qs.push(steps[pc++]);
+      await runQuestions(qs);
+      continue;
+    }
+    // A suggestion ends the turn: Claude asks, and the chosen option is what you type next.
+    if (s.t === 'confirm') {
+      addItem({ k: 'assistant', md: (s.text ? s.text + '\n\n' : '') + s.q, shown: (s.text ? s.text + '\n\n' : '') + s.q, gap: true });
+      const opts = s.options.length ? s.options : [{ label: 'Yes' }, { label: 'No' }];
+      reply = opts[Math.min(opts.length, s.choice || 1) - 1].label;
+      break;
+    }
     await runVisible(s, T, ms);
+  }
+  // At the end the counter covers whatever is left in about half a second.
+  if (!T.interrupted && st.spin) {
+    const sp = st.spin, from = sp.tokens;
+    sp.target = 0;
+    for (let u = 0; u < 1 && est.tokens - from > est.tokens * 0.005;) { await wait(30); u = Math.min(1, u + 30 / 520); sp.tokens = from + (est.tokens - from) * (1 - (1 - u) * (1 - u)); }
   }
   const elapsed = st.spin ? st.spin.elapsed : 0;
   stopSpinner();
   if (T.interrupted) addItem({ k: 'interrupted' });
-  else if (tokTarget) addItem({ k: 'worked', verb: pick(DONE_VERBS), secs: Math.max(1, Math.round(elapsed / 1000)), tokens: tokTarget, gap: true });
+  else if (est.explicit) addItem({ k: 'worked', verb: pick(DONE_VERBS), secs: Math.max(1, Math.round(elapsed / 1000)), tokens: est.tokens, gap: true });
   else if (S.workedFor && elapsed > 2000) addItem({ k: 'worked', verb: pick(DONE_VERBS), secs: Math.round(elapsed / 1000), gap: true });
   turn = null;
+  if (reply != null) {
+    await typeInput(reply);
+    submitUser(reply);
+    if (continuesTurn(steps, pc)) return runTurn(steps, pc);
+  }
   return pc;
+}
+// The person answers (a short pause per question) and the summary line appears.
+async function runQuestions(qs) {
+  const opts = q => [...q.options, { label: 'Other' }];
+  await wait(900 + qs.length * 700, true);
+  addItem({ k: 'answers', rows: qs.map(q => ({ q: q.q, a: opts(q)[Math.min(opts(q).length, q.choice || 1) - 1].label })), gap: true });
 }
 async function runVisible(s, T, ms) {
   switch (s.t) {
     case 'claude': {
       const it = addItem({ k: 'assistant', md: s.md, shown: S.reveal === 'stream' ? '' : s.md, gap: true });
-      if (st.spin) st.spin.tokens += s.md.length / 3.6;
       if (S.reveal === 'stream') {
         const ch = [...s.md];
         let i = 0;
@@ -973,7 +1044,6 @@ async function runVisible(s, T, ms) {
     }
     case 'reasoning':
       addItem({ k: 'reasoning', text: s.text, secs: Math.max(1, Math.round(ms / 1000)), gap: true });
-      if (st.spin) st.spin.tokens += s.text.length / 3.6;
       break;
     case 'tool': case 'toolerr': {
       const it = addItem({ k: 'tool', name: s.name, args: s.args, out: s.out, state: 'running', gap: true });

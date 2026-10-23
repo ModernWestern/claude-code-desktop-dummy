@@ -28,6 +28,7 @@
   </nav>
 
   <section data-pane="guion" class="on">
+    <div class="ver"><label for="versionSel">Interface</label><select id="versionSel"></select></div>
     <div class="seg" id="modeSeg">
       <button data-mode="magic">My pace</button>
       <button data-mode="auto">Automatic</button>
@@ -40,6 +41,10 @@
       <button data-snip="reasoning: " title="Claude's thinking block">reasoning</button>
       <button data-snip="tool: Web Search(&quot;query&quot;)" title="Tool call">tool</button>
       <button data-snip="user: /model {opus max}" title="Switch model and effort">model</button>
+      <button data-snip="question: Question?
+- Option (Recommended) | Description
+- Another option | Description
+[choose 1]" title="Multiple-choice question">question</button>
       <button data-snip="[pause 2]" title="Pause">pause</button>
     </div>
     <textarea id="script" spellcheck="false"></textarea>
@@ -56,7 +61,6 @@
     </div>
     <div class="state" id="runState"><i></i><span></span></div>
     <div class="keys"><kbd>F2</kbd> panel · <kbd>F8</kbd> play / pause · <kbd>F9</kbd> restart · <kbd>Ctrl</kbd>+<kbd>O</kbd> show reasoning · <kbd>Shift</kbd>+<kbd>Tab</kbd> mode · <kbd>Esc</kbd> interrupt · <kbd>F11</kbd> full screen</div>
-    <a class="swap" href="index.html">Open the same script in Claude Code Desktop →</a>
   </section>
 
   <section data-pane="ajustes">
@@ -171,6 +175,17 @@ permission: Bash(rm -rf ~/physics) | Deletes physics
 (No content)
 [choose 1]</pre>
       <p>The lines under <code>tool:</code> or <code>permission:</code> are the output. <code>[choose 1|2|3]</code> picks the permission option (3 = “No”, interrupts Claude).</p>
+<pre>question: How should I fix physics?
+- Delete it (Recommended) | No physics, no problem.
+- Rename it | Same chaos, better name.
+[choose 1]
+
+confirm: Want me to grade it too?
+I can also grade your homework.
+- Yes, grade it
+- No thanks
+[choose 1]</pre>
+      <p><code>question:</code> shows “● User answered Claude's questions” with the option picked by <code>[choose N]</code> (several questions in a row are answered together). <code>confirm:</code> is a suggestion from Claude: its text and question are shown, and the option picked by <code>[choose N]</code> is typed as your next message; the lines after it are Claude's next turn. In Claude Code Desktop both are cards with buttons.</p>
       <h3>Other effects</h3>
       <table>
         <tr><td><code>reasoning:</code></td><td>Claude's thinking. Shows as “∴ Thought for 8s”; <kbd>Ctrl</kbd>+<kbd>O</kbd> expands it.</td></tr>
@@ -178,7 +193,7 @@ permission: Bash(rm -rf ~/physics) | Deletes physics
         <tr><td><code>[info text]</code></td><td>Gray line with ⎿ (command output).</td></tr>
         <tr><td><code>[interrupt]</code></td><td>“Interrupted · What should Claude do instead?”</td></tr>
         <tr><td><code>[mode plan]</code></td><td>Prompt footer: <code>plan</code>, <code>edits</code>, <code>bypass</code> or <code>normal</code>.</td></tr>
-        <tr><td><code>[tokens 3.5M]</code></td><td>The answer “burns” that many tokens: the spinner counter climbs to it and ends with “✻ Worked for 9s · ↓ 3.5M tokens”. Accepts <code>800k</code>, <code>1200000</code>…</td></tr>
+        <tr><td><code>[tokens 3.5M]</code></td><td>The answer “burns” that many tokens: the spinner counter climbs steadily to it and ends with “✻ Worked for 9s · ↓ 3.5M tokens”. Without it, the counter still climbs to a realistic amount for the answer. Accepts <code>800k</code>, <code>1200000</code>…</td></tr>
         <tr><td><code>[context 3%]</code></td><td>“Context left until auto-compact: 3%”.</td></tr>
         <tr><td><code>[title Text]</code></td><td>Tab/window title (“✳ Text”), same as <code>@title</code>. Once set, it never changes: a later <code>[title]</code> is ignored until <code>/clear</code> starts a new session.</td></tr>
         <tr><td><code>[clear]</code> / <code>user: /clear</code></td><td>Clears the screen.</td></tr>
@@ -209,6 +224,7 @@ permission: Bash(rm -rf ~/physics) | Deletes physics
 </aside>
 
 <script src="js/example-script.js"></script>
+<script src="js/versions.js"></script>
 <script src="js/terminal.js"></script>
 </body>
 </html>
